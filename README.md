@@ -1,2 +1,2 @@
 # Project-Acetate
-A browser extension to annotate the web
+A browser extension to annotate the web.
