@@ -1,3 +1,24 @@
 #containedBody {
-    width: 50vw;
+    flex: 50vw;
+    height: 100vh;
+    border-right: 1pt solid darkgreen;
+}
+
+commentsContainer {
+    flex: 50vw;
+    height: 100vh;
+    border-left: 1pt solid darkgreen;
+}
+
+commentsContainer.h1 {
+    background-color: beige;
+    color: blueviolet;
+}
+
+.commentBox {
+    background-color: darkgreen;
+}
+
+body {
+    display: flex;
 }

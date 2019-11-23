@@ -21,8 +21,29 @@ function changeContainerState() {
         document.body.innerHTML = originalPageContents;
     } else {
         // content will be wrapped
-        document.body.innerHTML = '<div id="containedBody">' + document.body.innerHTML + '</div>';
+        document.body.innerHTML = 
+        '<div id="containedBody">' + document.body.innerHTML + '</div>' +
+
+        '<commentsContainer>' +
+            '<h1>Annotations</h1>' +
+        '</commentsContainer>' +
+
+        '<template id="commentBox ">' +
+            '<div class="commentBoxContainer">' +
+                '<textarea rows="4" cols="50"> '+
+                    'add comment here' +
+                '</textarea> '+
+                '<button>Add annotation</button'
+            '</div>' +
+        '</template>';
         //Dont do inner html, kills event listeners etc.
+
+        let commentsContainerElem = document.querySelector('commentsContainer');
+        let commentBoxTemplate =  document.querySelector('template');
+
+        //Create new comment instance
+        let clone = document.importNode(commentBoxTemplate.content, true);
+        commentsContainerElem.appendChild(clone);
     }
 
     containerStateActive = !containerStateActive;
