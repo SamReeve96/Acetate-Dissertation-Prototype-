@@ -21,6 +21,17 @@ function changeContainerState() {
         document.body.innerHTML = originalPageContents;
     } else {
         // content will be wrapped
+        document.head.innerHTML = document.head.innerHTML + 
+        '<script>' +
+            'function fireAddAnno() {' +
+                'var evt = document.createEvent("Event");' +
+                'evt.initEvent("myCustomEvent", true, false);' +
+                
+                '// fire the event' +
+                'document.dispatchEvent(evt); ' +
+            '} +'
+        '</script>'
+
         document.body.innerHTML = 
         '<div id="containedBody">' + document.body.innerHTML + '</div>' +
 
@@ -33,7 +44,7 @@ function changeContainerState() {
                 '<textarea rows="4" cols="50"> '+
                     'add comment here' +
                 '</textarea> '+
-                '<button>Add annotation</button'
+                '<button onclick="fireAddAnno()">Add annotation</button'
             '</div>' +
         '</template>';
         //Dont do inner html, kills event listeners etc.
@@ -49,6 +60,15 @@ function changeContainerState() {
     containerStateActive = !containerStateActive;
 }
 
+function AddAnnotation() {
+    let commentsContainerElem = document.querySelector('commentsContainer');
+    let commentBoxTemplate =  document.querySelector('template');
+
+    //Create new comment instance
+    let clone = document.importNode(commentBoxTemplate.content, true);
+    commentsContainerElem.appendChild(clone);
+}
+
 chrome.extension.onMessage.addListener(handleMessage);
 function handleMessage(request) {
     if (request.body === 'changeContainerState') {
@@ -57,5 +77,14 @@ function handleMessage(request) {
 }
 
 console.log('ready for lift off');
+
+document.addEventListener('myCustomEvent', function() {
+    let commentsContainerElem = document.querySelector('commentsContainer');
+    let commentBoxTemplate =  document.querySelector('template');
+
+    //Create new comment instance
+    let clone = document.importNode(commentBoxTemplate.content, true);
+    commentsContainerElem.appendChild(clone);
+  });
 
 debugger;
