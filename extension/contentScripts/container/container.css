@@ -1,16 +1,17 @@
 #containedBody {
     flex: 50vw;
-    height: 100vh;
+    height:100%;
     border-right: 1pt solid darkgreen;
 }
 
 commentsContainer {
+    font-family: 'roboto', arial;
     flex: 50vw;
-    height: 100vh;
+    height:100%;
     border-left: 1pt solid darkgreen;
 }
 
-commentsContainer.h1 {
+#containerHeader {
     background-color: beige;
     color: blueviolet;
 }

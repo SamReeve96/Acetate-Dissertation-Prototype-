@@ -6,32 +6,10 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
 
     if (savedStateActive) {
         // need to remove this on close
-        document.head.innerHTML = document.head.innerHTML + 
-        '<script>' +
-            'function fireAddAnno() {' +
-                'var evt = document.createEvent("Event");' +
-                'evt.initEvent("myCustomEvent", true, false);' +
-                
-                '// fire the event' +
-                'document.dispatchEvent(evt); ' +
-            '} +'
-        '</script>'
+        addScriptsToPage();
+        containPageContent()
+        createCommentContainer();
 
-        document.body.innerHTML = 
-        '<div id="containedBody">' + document.body.innerHTML + '</div>' +
-
-        '<commentsContainer>' +
-            '<h1>Annotations</h1>' +
-        '</commentsContainer>' +
-
-        '<template id="commentBox ">' +
-            '<div class="commentBoxContainer">' +
-                '<textarea rows="4" cols="50"> '+
-                    'add comment here' +
-                '</textarea> '+
-                '<button onclick="fireAddAnno()">Add annotation</button'
-            '</div>' +
-        '</template>';
 
         let commentsContainerElem = document.querySelector('commentsContainer');
         let commentBoxTemplate =  document.querySelector('template');
@@ -54,33 +32,10 @@ function changeContainerState() {
         document.body.innerHTML = originalPageContents;
     } else {
         // content will be wrapped
-        document.head.innerHTML = document.head.innerHTML + 
-        '<script>' +
-            'function fireAddAnno() {' +
-                'var evt = document.createEvent("Event");' +
-                'evt.initEvent("myCustomEvent", true, false);' +
-                
-                '// fire the event' +
-                'document.dispatchEvent(evt); ' +
-            '} +'
-        '</script>'
 
-        document.body.innerHTML = 
-        '<div id="containedBody">' + document.body.innerHTML + '</div>' +
-
-        '<commentsContainer>' +
-            '<h1>Annotations</h1>' +
-        '</commentsContainer>' +
-
-        '<template id="commentBox ">' +
-            '<div class="commentBoxContainer">' +
-                '<textarea rows="4" cols="50"> '+
-                    'add comment here' +
-                '</textarea> '+
-                '<button onclick="fireAddAnno()">Add annotation</button'
-            '</div>' +
-        '</template>';
-        //Dont do inner html, kills event listeners etc.
+        addScriptsToPage();
+        containPageContent()
+        createCommentContainer();
 
         let commentsContainerElem = document.querySelector('commentsContainer');
         let commentBoxTemplate =  document.querySelector('template');
@@ -91,6 +46,46 @@ function changeContainerState() {
     }
 
     containerStateActive = !containerStateActive;
+}
+
+function addScriptsToPage() {
+    document.head.innerHTML = document.head.innerHTML + 
+    '<script>' +
+        'function fireAddAnno() {' +
+            'var evt = document.createEvent("Event");' +
+            'evt.initEvent("myCustomEvent", true, false);' +
+            
+            'function test() {' +
+                'alert("test!");' +
+            '}' +
+
+            // fire the event
+            'document.dispatchEvent(evt); ' +
+        '}' +
+    '</script>' +
+
+    //Add google font for now
+    "<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>"
+}
+
+function containPageContent() {
+    document.body.innerHTML = '<div id="containedBody">' + document.body.innerHTML + '</div>'
+}
+
+function createCommentContainer() {
+    document.body.innerHTML = document.body.innerHTML +
+    '<commentsContainer>' +
+        '<h1 id=containerHeader >Annotations</h1>' +
+    '</commentsContainer>' +
+
+    '<template id="commentBox ">' +
+        '<div class="commentBoxContainer">' +
+            '<textarea rows="4" cols="50"> '+
+                'add comment here' +
+            '</textarea> '+
+            '<button onclick="test()">Add annotation</button'
+        '</div>' +
+    '</template>';
 }
 
 function AddAnnotation() {
