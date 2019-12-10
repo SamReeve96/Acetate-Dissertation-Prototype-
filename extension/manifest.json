@@ -14,13 +14,13 @@
             ],
             "js": 
             [
-                "contentScripts/container/container.js",
+                "contentScripts/contentContainer/contentContainer.js",
                 "contentScripts/commentContainer/commentBox.js",
                 "contentScripts/content.js"
             ],
             "css":
             [
-                "contentScripts/container/container.css"
+                "contentScripts/contentContainer/contentContainer.css"
             ]
         }
     ],
