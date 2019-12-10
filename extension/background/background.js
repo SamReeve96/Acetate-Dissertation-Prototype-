@@ -1,5 +1,5 @@
-chrome.storage.sync.set({ activeOnPageLoad: false }, function () {
-    console.log("by default, the extension is not active");
+chrome.storage.sync.set({ activeOnPageLoad: true }, function () {
+    console.log("by default, the extension is active, because it's in development and it saves time");
 });
 
 chrome.runtime.onMessage.addListener(reciver);

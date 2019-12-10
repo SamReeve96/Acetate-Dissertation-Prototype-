@@ -14,7 +14,9 @@
             ],
             "js": 
             [
-                "contentScripts/container/container.js"
+                "contentScripts/container/container.js",
+                "contentScripts/commentContainer/commentBox.js",
+                "contentScripts/content.js"
             ],
             "css":
             [

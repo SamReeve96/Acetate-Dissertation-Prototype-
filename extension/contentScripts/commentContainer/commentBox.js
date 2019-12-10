@@ -1,5 +1,10 @@
-// Test to see if the browser supports the HTML template element by checking
-// for the presence of the template element's content attribute.
-if ('content' in document.createElement('template')) {
-    
+//Manage comments 
+
+function AddAnnotation() {
+    let commentsContainerElem = document.querySelector('commentsContainer');
+    let commentBoxTemplate =  document.querySelector('template');
+
+    //Create new comment instance
+    let clone = document.importNode(commentBoxTemplate.content, true);
+    commentsContainerElem.appendChild(clone);
 }
