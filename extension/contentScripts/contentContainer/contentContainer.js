@@ -6,9 +6,3 @@ function fireAddnno() {
     // fire the event
     document.dispatchEvent(evt);
 }
-
-function test() {
-    alert('Hello world!');
-}
-
-alert('Hello Sam!');
