@@ -3,11 +3,14 @@
 // intialze active state variable
 let containerStateActive = false;
 
-// add listener for changes in container state
+// add listener for messages from backend
 chrome.extension.onMessage.addListener(handleMessage);
 function handleMessage(request) {
-    if (request.body === 'changeContainerState') {
+    if (request.type === 'changeContainerState') {
         changeContainerState();
+    }
+    if (request.type === 'addAnnotation') {
+        AddAnnotation(request.content);
     }
 }
 
@@ -21,13 +24,8 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
         containPageContent()
         createCommentContainer();
 
-
-        let commentsContainerElem = document.querySelector('commentsContainer');
-        let commentBoxTemplate =  document.querySelector('template');
-
-        //Create new comment instance
-        let clone = document.importNode(commentBoxTemplate.content, true);
-        commentsContainerElem.appendChild(clone);
+        // done for the demo, as normally it'd load preexsiting annos or user can add to empty
+        AddAnnotation();
     }
     //If the container isnt active in settings dont wrap content
 
@@ -41,6 +39,7 @@ function changeContainerState() {
         let originalPageContentsElem = document.getElementById('containedBody');
         let originalPageContents = originalPageContentsElem.innerHTML;
         document.body.innerHTML = originalPageContents;
+        document.body.removeAttribute("id")
     } else {
         // content will be wrapped
 
@@ -48,12 +47,8 @@ function changeContainerState() {
         containPageContent()
         createCommentContainer();
 
-        let commentsContainerElem = document.querySelector('commentsContainer');
-        let commentBoxTemplate =  document.querySelector('template');
-
-        //Create new comment instance
-        let clone = document.importNode(commentBoxTemplate.content, true);
-        commentsContainerElem.appendChild(clone);
+        // done for the demo, as normally it'd load preexsiting annos or user can add to empty
+        AddAnnotation();
     }
 
     containerStateActive = !containerStateActive;
@@ -61,10 +56,8 @@ function changeContainerState() {
 
 // Manage the content conatiner
 function addScriptsToPage() {
-    document.head.innerHTML = document.head.innerHTML + 
-
-
     //Add google font for now
+    document.head.innerHTML = document.head.innerHTML + 
     "<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>"
 }
 
@@ -80,12 +73,15 @@ function createCommentContainer() {
 
     '<template>' +
         '<div class="commentBox">' +
-            '<textarea class="commentTextArea" rows="4" cols="20"> '+
-                'add comment here' +
+            '<textarea class="commentTextArea" rows="4" cols="20"> ' +
+            'If youre reading this, then the tempate was used incorrectly' +
             '</textarea> '+
-            '<button onclick="test()">Add annotation</button'
+        
+            '<button class="addAnnotation">Add annotation</button>' +
         '</div>' +
     '</template>';
+
+    document.body.id = 'alteredBody';
 }
 
 console.log('ready for lift off');
