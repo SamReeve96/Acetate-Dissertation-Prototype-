@@ -17,6 +17,9 @@ function receiver(request, sender, sendResponse) {
     if (request.type === 'changeActiveState') {
         sendChangeContainerState();
     }
+    if (request.type === 'setNewContextElement') {
+        setContextElement(request.content);
+    }
 }
 
 function sendChangeContainerState() {
@@ -33,20 +36,32 @@ function sendChangeContainerState() {
     });
 }
 
+//------------------------
+
 chrome.contextMenus.create( {
     id: "Annotate Element",
     title: "Annotate %s", 
-    contexts: ["page", "selection", "image", "link"],
+    contexts: ["page", "selection", "image", "link"]
 });
+
+let contextElement;
+
+//set the element of the last right clicked element from the buffer in the
+function setContextElement(newElement) {
+    contextElement = newElement;
+}
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     if (info.menuItemId == "Annotate Element") {
+        // get element right clicked
         sendAddAnnotation(info, tab);
     }
 });
 
 function sendAddAnnotation(info, tab) {
     //Inform content script to add an annotation
+    info.contextElement = contextElement;
+
     let message = {
         type: 'addAnnotation',
         content: info

@@ -25,6 +25,7 @@ function AddAnnotation(annotationItem) {
 
     if (annotationItem !== undefined) {
         annotationText = annotationItem.selectionText;
+        annotationText += ' and the element was a ' + annotationItem.contextElement;
     } 
     else {
         annotationText = "No text or element selected";

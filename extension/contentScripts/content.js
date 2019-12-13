@@ -45,6 +45,7 @@ function changeContainerState() {
 
         addScriptsToPage();
         containPageContent();
+        auditElements();
         createCommentContainer();
 
         // done for the demo, as normally it'd load pre-existing annotations or user can add to empty
@@ -52,6 +53,16 @@ function changeContainerState() {
     }
 
     containerStateActive = !containerStateActive;
+}
+
+// Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
+function auditElements() {
+    elementCounter = 1;
+    elementsToAudit = document.getElementById('containedBody');
+    elementsToAudit.querySelectorAll('*').forEach(function(element) {
+        element.setAttribute('element_audit_id', elementCounter);
+        elementCounter++;
+    });
 }
 
 // Manage the content container
@@ -83,5 +94,21 @@ function createCommentContainer() {
 
     document.body.id = 'alteredBody';
 }
+
+//-----------------
+
+document.addEventListener("mousedown", function(event){
+    //right click
+    if(event.button == 2) { 
+        contextElement = event.target;
+
+        let message = {
+            type: 'setNewContextElement',
+            content: contextElement.nodeName,
+        };
+    
+        chrome.runtime.sendMessage(message);
+    }
+}, true);
 
 console.log('ready for lift off');
