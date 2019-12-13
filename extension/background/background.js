@@ -11,8 +11,8 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 });
 
 // add listener to change extension state (triggered by popup.js)
-chrome.runtime.onMessage.addListener(reciver);
-function reciver(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(receiver);
+function receiver(request, sender, sendResponse) {
     console.log(request);
     if (request.type === 'changeActiveState') {
         sendChangeContainerState();
@@ -23,7 +23,7 @@ function sendChangeContainerState() {
     //Inform content script to change container state
     let message = {
         type: 'changeContainerState'
-    }
+    };
 
     //Send message
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -41,7 +41,7 @@ chrome.contextMenus.create( {
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     if (info.menuItemId == "Annotate Element") {
-        sendAddAnnotation(info, tab)
+        sendAddAnnotation(info, tab);
     }
 });
 
@@ -50,7 +50,7 @@ function sendAddAnnotation(info, tab) {
     let message = {
         type: 'addAnnotation',
         content: info
-    }
+    };
 
     //Send message
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {

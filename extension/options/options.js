@@ -6,6 +6,6 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
 
 activeOnPageLoad.addEventListener( 'change', function() {
     chrome.storage.sync.set({ activeOnPageLoad: activeOnPageLoadCheckBox.checked }, function () {
-        console.log('acertate is active on page load:' + activeOnPageLoadCheckBox.checked);
-    })
+        console.log('acetate is active on page load:' + activeOnPageLoadCheckBox.checked);
+    });
 });
