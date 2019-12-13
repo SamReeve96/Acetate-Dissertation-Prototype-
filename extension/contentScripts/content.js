@@ -23,6 +23,7 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
         addScriptsToPage();
         containPageContent();
         createCommentContainer();
+        auditElements();
 
         // done for the demo, as normally it'd load pre-existing annotations or user can add to empty
         AddAnnotation();

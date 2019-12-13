@@ -2,7 +2,7 @@ commentsContainer {
     border-left: 3pt solid pink;
     background-color: #FFFF0A;
     font-family: 'roboto', arial;
-    /*Shouldnt need to be done with the proper 2X shadow dom implementation*/
+    /*Shouldn't need to be done with the proper 2X shadow dom implementation*/
     max-height: 100vh;
     overflow-x: hidden;
     overflow-y: auto;
