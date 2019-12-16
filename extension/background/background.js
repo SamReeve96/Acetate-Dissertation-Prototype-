@@ -11,16 +11,18 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 });
 
 // add listener to change extension state (triggered by popup.js)
-chrome.runtime.onMessage.addListener(receiver);
-function receiver(request, sender, sendResponse) {
-    console.log(request);
-    if (request.type === 'changeActiveState') {
-        sendChangeContainerState();
-    }
-    if (request.type === 'setNewContextElement') {
-        setContextElement(request.content);
+chrome.runtime.onMessage.addListener(handleMessage);
+function handleMessage(request) {
+    switch (request.type) {
+        case 'changeActiveState':
+            sendChangeContainerState();
+            break;
+        case 'setNewContextElement':
+            setContextElementData(request);
+            break;
     }
 }
+
 
 function sendChangeContainerState() {
     //Inform content script to change container state
@@ -44,26 +46,28 @@ chrome.contextMenus.create( {
     contexts: ["page", "selection", "image", "link"]
 });
 
-let contextElement;
+let contextElementData;
 
 //set the element of the last right clicked element from the buffer in the
-function setContextElement(newElement) {
-    contextElement = newElement;
+function setContextElementData(newElementData) {
+    contextElementData = newElementData;
 }
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     if (info.menuItemId == "Annotate Element") {
         // get element right clicked
-        sendAddAnnotation(info, tab);
+        sendCreateAnnotation(info, tab);
     }
 });
 
-function sendAddAnnotation(info, tab) {
-    //Inform content script to add an annotation
-    info.contextElement = contextElement;
-
+function sendCreateAnnotation(info, tab) {
+    // Add the current context element
+    info.elementType = contextElementData.elementType;
+    info.elementAuditID = contextElementData.elementAuditID;
+    
+    // Inform content script to add an annotation
     let message = {
-        type: 'addAnnotation',
+        type: 'createAnnotation',
         content: info
     };
 
@@ -73,4 +77,6 @@ function sendAddAnnotation(info, tab) {
             console.log('message sent');
         });
     });
+
+    contextElement = undefined;
 }

@@ -4,8 +4,24 @@
 // plus should be appended to the comment container not the button?
 annotationId = 1;
 
-function AddAnnotation(annotationItem) {
-    let commentsContainerElem = document.querySelector('commentsContainer');
+annotations = [];
+
+function CreateAnnotation(annotationData) {
+    let newAnnotation = {
+        ID: 'No Id, this will be assigned by the database (also this string indicate the anno hasn\'nt been sent to the db yet and so should be cached if I do annotation caching)',
+        elementAuditID: annotationData.elementAuditID,
+        elementType: annotationData.elementType,
+        selectedText: annotationData.selectionText,
+        created: Date.now()
+    };
+
+    annotations.push(newAnnotation);
+
+    displayAnnotation(newAnnotation);
+}
+
+function displayAnnotation(annotation) {
+    let commentsContainerElem = document.querySelector('div#comments');
     let commentBoxTemplate =  document.querySelector('template');
     
     
@@ -14,26 +30,25 @@ function AddAnnotation(annotationItem) {
     
     // Allows the extension to work out what annotation button was pressed
     let annotationButton = clone.querySelector('button');
-    annotationButton.id = annotationId;
     annotationId++;
     annotationButton.addEventListener('click', function() {
-        AddAnnotation();
+        SaveAnnotation();
     });
 
-    // For demo populate annotation with selected text //TODO selected element
+    // For demo populate annotation with selected text
     let annotationTextBox = clone.querySelector('textarea');
 
-    if (annotationItem !== undefined) {
-        annotationText = annotationItem.selectionText;
-        annotationText += ' and the element was a ' + annotationItem.contextElement;
-    } 
-    else {
-        annotationText = "No text or element selected";
+    if (annotation !== undefined) {
+        annotationText = 'Text selected "' + annotation.selectedText + '"'
+                      + '\n and the element type is: ' + annotation.elementType
+                      + '\n and the element id is: ' + annotation.elementAuditID
+                      + '\n and the element was created at: ' + annotation.created.toLocaleString();
+    } else {
+        annotationText = 'No data, error?';
     }
 
     annotationTextBox.innerHTML = annotationText;
 
     commentsContainerElem.appendChild(clone);
 }
-
 

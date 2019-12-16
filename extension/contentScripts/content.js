@@ -6,11 +6,13 @@ let containerStateActive = false;
 // add listener for messages from backend
 chrome.extension.onMessage.addListener(handleMessage);
 function handleMessage(request) {
-    if (request.type === 'changeContainerState') {
-        changeContainerState();
-    }
-    if (request.type === 'addAnnotation') {
-        AddAnnotation(request.content);
+    switch (request.type) {
+        case 'changeContainerState':
+            ChangeContainerState();
+            break;
+        case 'createAnnotation':
+            CreateAnnotation(request.content);
+            break;
     }
 }
 
@@ -24,9 +26,6 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
         containPageContent();
         createCommentContainer();
         auditElements();
-
-        // done for the demo, as normally it'd load pre-existing annotations or user can add to empty
-        AddAnnotation();
     }
     //If the container isn't active in settings don't wrap content
 
@@ -34,7 +33,7 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
     containerStateActive = savedStateActive;
 });
 
-function changeContainerState() {
+function ChangeContainerState() {
     if (containerStateActive) {
         // container is active so release the content
         let originalPageContentsElem = document.getElementById('containedBody');
@@ -48,9 +47,6 @@ function changeContainerState() {
         containPageContent();
         auditElements();
         createCommentContainer();
-
-        // done for the demo, as normally it'd load pre-existing annotations or user can add to empty
-        AddAnnotation();
     }
 
     containerStateActive = !containerStateActive;
@@ -98,6 +94,7 @@ function createCommentContainer() {
 
 //-----------------
 
+// Work out what element was right clicked
 document.addEventListener("mousedown", function(event){
     //right click
     if(event.button == 2) { 
@@ -105,7 +102,9 @@ document.addEventListener("mousedown", function(event){
 
         let message = {
             type: 'setNewContextElement',
-            content: contextElement.nodeName,
+            //contextElement: contextElement, look into this...
+            elementType: contextElement.nodeName,
+            elementAuditID: contextElement.getAttribute('element_audit_id')
         };
     
         chrome.runtime.sendMessage(message);
