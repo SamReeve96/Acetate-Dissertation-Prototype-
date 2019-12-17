@@ -16,6 +16,13 @@ function handleMessage(request) {
     }
 }
 
+// Check if the comments panel should be in dark mode by default
+let darkModeByDefault;
+
+chrome.storage.sync.get('darkModeByDefault', function (data) {
+    darkModeByDefault = data.darkModeByDefault;
+});
+
 // open the comment window and contain content on page load
 chrome.storage.sync.get('activeOnPageLoad', function (data) {
     let savedStateActive = data.activeOnPageLoad;
@@ -98,6 +105,12 @@ function createCommentContainer() {
     darkModeButton.addEventListener('click', function() {
         changeTheme();
     });
+
+    // if the user has set the theme to be dark mode by default, change to dark mode
+    if (darkModeByDefault) 
+    {
+        changeTheme();
+    }
 
     document.body.id = 'alteredBody';
 }

@@ -80,3 +80,7 @@ function sendCreateAnnotation(info, tab) {
 
     contextElement = undefined;
 }
+
+chrome.storage.sync.set({ darkModeByDefault: true }, function () {
+    console.log("by default, the extension is in dark mode, because it's dark mode");
+});
