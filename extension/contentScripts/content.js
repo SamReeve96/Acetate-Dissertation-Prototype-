@@ -76,18 +76,28 @@ function containPageContent() {
 function createCommentContainer() {
     document.body.innerHTML = document.body.innerHTML +
     '<commentsContainer>' +
-        '<h1 id=containerHeader >Annotations</h1>' +
+        '<h1 id=containerHeader >' +
+            'Annotations' +
+            '<button id="darkMode">darkMode</button>' +
+        '</h1>' +
+        '<div id=comments ></div>' +
     '</commentsContainer>' +
 
     '<template>' +
         '<div class="commentBox">' +
-            '<textarea class="commentTextArea" rows="4" cols="20"> ' +
+            '<textarea class="commentTextArea"> ' +
             'If you\'re reading this, then the template was used incorrectly' +
             '</textarea> '+
-        
-            '<button class="addAnnotation">Add annotation</button>' +
+            '<div class="controls">' +
+                '<button>Save Annotation</button>' +
+            '</div>' +
         '</div>' +
     '</template>';
+
+    let darkModeButton = document.querySelector('#darkMode');
+    darkModeButton.addEventListener('click', function() {
+        changeTheme();
+    });
 
     document.body.id = 'alteredBody';
 }

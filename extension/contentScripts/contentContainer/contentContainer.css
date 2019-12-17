@@ -1,5 +1,5 @@
 #containedBody {
-    border-right: 3pt solid cyan;
     flex: 67vw;
-    /*Shouldnt need to be done with the proper 2X shadow dom implementation*/
+    /*shouldn't need to be done with the proper 2X shadow dom implementation*/
+    margin-right: 10px; 
 }

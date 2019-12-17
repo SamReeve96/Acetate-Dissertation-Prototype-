@@ -21,7 +21,7 @@ function CreateAnnotation(annotationData) {
 }
 
 function displayAnnotation(annotation) {
-    let commentsContainerElem = document.querySelector('div#comments');
+    let commentsDiv = document.querySelector('div#comments');
     let commentBoxTemplate =  document.querySelector('template');
     
     
@@ -29,11 +29,14 @@ function displayAnnotation(annotation) {
     let clone = document.importNode(commentBoxTemplate.content, true);
     
     // Allows the extension to work out what annotation button was pressed
-    let annotationButton = clone.querySelector('button');
+    let annotationButton = clone.querySelector('.controls button');
     annotationId++;
     annotationButton.addEventListener('click', function() {
         SaveAnnotation();
     });
+
+    let annotationBox = clone.querySelector('.commentBox');
+    annotationBox.classList.add(randomColour());
 
     // For demo populate annotation with selected text
     let annotationTextBox = clone.querySelector('textarea');
@@ -49,6 +52,50 @@ function displayAnnotation(annotation) {
 
     annotationTextBox.innerHTML = annotationText;
 
-    commentsContainerElem.appendChild(clone);
+    // apply theme styles if needed
+    let isInDarkMode = checkTheme();
+
+    if (isInDarkMode) {
+        annotationTextBox.classList.add('dark');
+    }
+
+    commentsDiv.appendChild(clone);
 }
 
+function randomColour() {
+    let colors = ['pink', 'yellow', 'cyan', 'green'];
+    min = 0;
+    max = colors.length;
+    let randomIndex = Math.floor(Math.random() * (max - min)) + min;
+
+    return colors[randomIndex];
+}
+
+function checkTheme() {
+    let commentsContainer = document.querySelector('commentscontainer');
+    return commentsContainer.classList.contains('dark');
+}
+
+function changeTheme() {
+    let commentsContainer = document.querySelector('commentscontainer');
+    let containerHeader = document.querySelector('#containerHeader');
+    let commentTextAreas = [...document.getElementsByClassName('commentTextArea')];
+
+    let isInDarkMode = checkTheme();
+
+    if (isInDarkMode)
+    {
+        // remove dark mode classes
+        commentsContainer.classList.remove('dark');
+        containerHeader.classList.remove('dark');
+        commentTextAreas.forEach(cta => {
+            cta.classList.remove('dark');
+        });
+
+    } else {
+        // add dark mode classes
+        commentsContainer.classList.add('dark');
+        containerHeader.classList.add('dark');
+        commentTextAreas.forEach(cta => cta.classList.add('dark'));
+    }
+}
