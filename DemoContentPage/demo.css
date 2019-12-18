@@ -11,3 +11,7 @@ p {
 body {
     background-color: whitesmoke;
 }
+
+#testImage {
+    width: 400px;
+}

@@ -11,19 +11,24 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 });
 
 // add listener to change extension state (triggered by popup.js)
-chrome.runtime.onMessage.addListener(reciver);
-function reciver(request, sender, sendResponse) {
-    console.log(request);
-    if (request.type === 'changeActiveState') {
-        sendChangeContainerState();
+chrome.runtime.onMessage.addListener(handleMessage);
+function handleMessage(request) {
+    switch (request.type) {
+        case 'changeActiveState':
+            sendChangeContainerState();
+            break;
+        case 'setNewContextElement':
+            setContextElementData(request);
+            break;
     }
 }
+
 
 function sendChangeContainerState() {
     //Inform content script to change container state
     let message = {
         type: 'changeContainerState'
-    }
+    };
 
     //Send message
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -33,24 +38,38 @@ function sendChangeContainerState() {
     });
 }
 
+//------------------------
+
 chrome.contextMenus.create( {
     id: "Annotate Element",
     title: "Annotate %s", 
-    contexts: ["page", "selection", "image", "link"],
+    contexts: ["page", "selection", "image", "link"]
 });
+
+let contextElementData;
+
+//set the element of the last right clicked element from the buffer in the
+function setContextElementData(newElementData) {
+    contextElementData = newElementData;
+}
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     if (info.menuItemId == "Annotate Element") {
-        sendAddAnnotation(info, tab)
+        // get element right clicked
+        sendCreateAnnotation(info, tab);
     }
 });
 
-function sendAddAnnotation(info, tab) {
-    //Inform content script to add an annotation
+function sendCreateAnnotation(info, tab) {
+    // Add the current context element
+    info.elementType = contextElementData.elementType;
+    info.elementAuditID = contextElementData.elementAuditID;
+    
+    // Inform content script to add an annotation
     let message = {
-        type: 'addAnnotation',
+        type: 'createAnnotation',
         content: info
-    }
+    };
 
     //Send message
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -58,4 +77,10 @@ function sendAddAnnotation(info, tab) {
             console.log('message sent');
         });
     });
+
+    contextElement = undefined;
 }
+
+chrome.storage.sync.set({ darkModeByDefault: true }, function () {
+    console.log("by default, the extension is in dark mode, because it's dark mode");
+});

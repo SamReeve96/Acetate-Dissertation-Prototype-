@@ -2,7 +2,8 @@ let activateButton = document.getElementById('Activate');
 
 activateButton.onclick = function () {
     let message = {
-        body: 'changeActiveState'
-    }
+        type: 'changeActiveState'
+    };
+
     chrome.runtime.sendMessage(message);
-}
+};

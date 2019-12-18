@@ -1,24 +1,77 @@
 commentsContainer {
-    border-left: 3pt solid pink;
-    background-color: #FFFF0A;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.2) -20px 0px 10px 0px;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.2) -20px 0px 10px 0px;
+    -moz-box-shadow: rgba(0, 0, 0, 0.2) -20px 0px 10px 0px;
     font-family: 'roboto', arial;
-    /*Shouldnt need to be done with the proper 2X shadow dom implementation*/
-    max-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto;
+    height: 100%;
+    margin: -8px 0em 0em;
+    max-width: 500px;
+    min-height: 100vh;
+    min-width: 300px;
+    width: 33vw;
+}
+
+.dark {
+    background-color: #353535;
 }
 
 #containerHeader {
-    background-color: beige;
+    background-color: none;
     color: blueviolet;
+    margin: 5px 0 0 0;
+    text-align: center;
+}
+
+.dark#containerHeader {
+    color: rgb(215, 82, 255);
+}
+
+#comments {
+    display: flex;
+    flex-direction: column;
+    /*Shouldn't need to be done with the proper 2X shadow dom implementation*/
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0 5px;
 }
 
 .commentBox {
-    background-color: darkgreen;
-    width: 100%;
+    display: flex;
+    margin-bottom: 5px;
+    padding: 3px;
+    background-color: rgb(53, 53, 53);
+}
+
+.commentBox.pink {
+    background-color: fuchsia;
+}
+
+.commentBox.yellow {
+    background-color: yellow;
+}
+
+.commentBox.cyan {
+    background-color: cyan;
+}
+
+.commentBox.green {
+    background-color: greenyellow;
 }
 
 .commentTextArea {
+    flex: 4;
+    min-height: 10em;
     resize: none;
-    width: 100%;
+}
+
+.dark.commentTextArea {
+    background-color: #353535;;
+    color: white;
+
+}
+
+.controls {
+    flex: 1;
+    height: 100%;
 }
