@@ -33,6 +33,7 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
         containPageContent();
         createCommentContainer();
         auditElements();
+        loadAnnotationsFromCache();
     }
     //If the container isn't active in settings don't wrap content
 
@@ -54,6 +55,7 @@ function ChangeContainerState() {
         containPageContent();
         auditElements();
         createCommentContainer();
+        loadAnnotationsFromCache();
     }
 
     containerStateActive = !containerStateActive;
@@ -114,8 +116,6 @@ function createCommentContainer() {
 
     document.body.id = 'alteredBody';
 }
-
-//-----------------
 
 // Work out what element was right clicked
 document.addEventListener("mousedown", function(event){
