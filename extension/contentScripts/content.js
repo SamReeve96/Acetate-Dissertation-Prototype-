@@ -3,6 +3,9 @@
 // initialize active state variable
 let containerStateActive = false;
 
+// Check if the comments panel should be in dark mode by default
+let darkModeByDefault;
+
 // add listener for messages from backend
 chrome.extension.onMessage.addListener(handleMessage);
 function handleMessage(request) {
@@ -16,9 +19,6 @@ function handleMessage(request) {
     }
 }
 
-// Check if the comments panel should be in dark mode by default
-let darkModeByDefault;
-
 chrome.storage.sync.get('darkModeByDefault', function (data) {
     darkModeByDefault = data.darkModeByDefault;
 });
@@ -28,12 +28,7 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
     let savedStateActive = data.activeOnPageLoad;
 
     if (savedStateActive) {
-        // need to remove this on close
-        addScriptsToPage();
-        containPageContent();
-        createCommentContainer();
-        auditElements();
-        loadAnnotationsFromCache();
+        LoadExtension();
     }
     //If the container isn't active in settings don't wrap content
 
@@ -43,22 +38,28 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
 
 function ChangeContainerState() {
     if (containerStateActive) {
-        // container is active so release the content
-        let originalPageContentsElem = document.getElementById('containedBody');
-        let originalPageContents = originalPageContentsElem.innerHTML;
-        document.body.innerHTML = originalPageContents;
-        document.body.removeAttribute("id");
+        UnloadExtension();
     } else {
-        // content will be wrapped
-
-        addScriptsToPage();
-        containPageContent();
-        auditElements();
-        createCommentContainer();
-        loadAnnotationsFromCache();
+        LoadExtension();
     }
 
     containerStateActive = !containerStateActive;
+}
+
+function LoadExtension() {
+    addScriptsToPage();
+    containPageContent();
+    auditElements();
+    createCommentContainer();
+    loadAnnotationsFromCache();
+}
+
+function UnloadExtension() {
+    // container is active so release the content
+    let originalPageContentsElem = document.getElementById('containedBody');
+    let originalPageContents = originalPageContentsElem.innerHTML;
+    document.body.innerHTML = originalPageContents;
+    document.body.removeAttribute("id");
 }
 
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type

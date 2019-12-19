@@ -4,15 +4,17 @@
 // plus should be appended to the comment container not the button?
 annotationId = 1;
 
-// annotationInstance = {
-//     instanceURL: '',
-//     annotations: []
-// };
+let currentOriginAndPath = window.location.origin + window.location.pathname;
+
+annotationInstance = {
+    instanceURL: currentOriginAndPath,
+    annotations: []
+};
 
 // Create annotation object
 function CreateAnnotation(annotationData) {
     let newAnnotation = {
-        ID: 'No Id, this will be assigned by the database (also this string indicate the anno hasn\'nt been sent to the db yet and so should be cached if I do annotation caching)',
+        ID: 'No Id, this will be assigned by the database (also this string indicates the anno hasn\'nt been sent to the db yet and so should be cached if I do annotation caching)',
         elementAuditID: annotationData.elementAuditID,
         elementType: annotationData.elementType,
         selectedText: annotationData.selectionText,
@@ -46,8 +48,9 @@ function cacheAnnotation(newAnnotation) {
 function loadAnnotationsFromCache() {
     // set variable instance to cache instance
     chrome.storage.sync.get(['annotationInstance'], function (result) {
-        console.log('Value currently is ' + result.annotationInstance);
-        if (result.hasOwnProperty('annotationInstance')) {
+        let annotationInstance = result.annotationInstance;
+        console.log('Value currently is ' + annotationInstance);
+        if (result.hasOwnProperty('annotationInstance') && annotationInstance.instanceURL === currentOriginAndPath) {
             annotationInstance = result.annotationInstance;
 
             // for all annotations, load
@@ -55,11 +58,6 @@ function loadAnnotationsFromCache() {
                 displayAnnotation(annotation);
             });
 
-        } else {
-            annotationInstance = {
-                instanceURL: '',
-                annotations: []
-            };
         }
     });
 }

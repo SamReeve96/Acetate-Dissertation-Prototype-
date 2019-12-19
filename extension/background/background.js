@@ -25,6 +25,7 @@ function handleMessage(request) {
             break;
         case 'loadFromCache':
             sendLoadFromCache(request.key);
+            break;
     }
 }
 
@@ -42,8 +43,6 @@ function sendChangeContainerState() {
         });
     });
 }
-
-//------------------------
 
 chrome.contextMenus.create( {
     id: "Annotate Element",
