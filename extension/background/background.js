@@ -89,9 +89,29 @@ chrome.storage.sync.set({ darkModeByDefault: true }, function () {
     console.log("by default, the extension is in dark mode, because it's dark mode");
 });
 
-function cacheInstance(annotationInstance) {
-    chrome.storage.sync.set({
-        'annotationInstance': annotationInstance
+function cacheInstance(currentInstance) {
+    // get all the instances
+    chrome.storage.sync.get(['annotationInstances'], function (result) {
+        let annotationInstances = result.annotationInstances;
+
+        // if there are any instances
+        if (annotationInstances)
+        {
+            let filteredInstances = result.annotationInstances.filter(instance => (instance.url === currentInstance.url));
+
+            if (filteredInstances.length == 1) { // TODO: handle multiple instances of the same page, 
+                // update instances (remove old instance of url
+                annotationInstances = annotationInstances.filter(instance => (instance.url !== currentInstance.url));
+            }
+        } else {
+            annotationInstances = [];
+        }
+        // Add new url instance
+        annotationInstances.push(currentInstance);
+        // save new array of instances
+        chrome.storage.sync.set({
+            'annotationInstances': annotationInstances
+        });
     });
 }
 

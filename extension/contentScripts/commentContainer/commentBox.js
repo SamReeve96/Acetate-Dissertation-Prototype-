@@ -6,8 +6,10 @@ annotationId = 1;
 
 let currentOriginAndPath = window.location.origin + window.location.pathname;
 
+annotationInstances = [];
+
 annotationInstance = {
-    instanceURL: currentOriginAndPath,
+    url: currentOriginAndPath,
     annotations: []
 };
 
@@ -47,18 +49,18 @@ function cacheAnnotation(newAnnotation) {
 // when the extension is loaded on a page, load all the annotations from the cache
 function loadAnnotationsFromCache() {
     // set variable instance to cache instance
-    chrome.storage.sync.get(['annotationInstance'], function (result) {
-        let annotationInstance = result.annotationInstance;
-        console.log('Value currently is ' + annotationInstance);
-        if (result.hasOwnProperty('annotationInstance') && annotationInstance.instanceURL === currentOriginAndPath) {
-            annotationInstance = result.annotationInstance;
+    chrome.storage.sync.get(['annotationInstances'], function (result) {
+        let annotationInstances = result.annotationInstances;
+
+        //Filter all instances stored in the browser and check if the current page already has an instance
+        filteredInstances = annotationInstances.filter(instance => (instance.url === currentOriginAndPath));
+        if (filteredInstances.length == 1) { // TODO: handle multiple instances of the same page, 
+            annotationInstance = filteredInstances[0];
 
             // for all annotations, load
-            annotationInstance.annotations.forEach(annotation => {
-                displayAnnotation(annotation);
-            });
-
+            annotationInstance.annotations.forEach(annotation => { displayAnnotation(annotation); });
         }
+        // else no instance of this page has been annotated, so use the blank one
     });
 }
 
