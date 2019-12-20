@@ -7,26 +7,34 @@ let currentOriginAndPath = window.location.origin + window.location.pathname;
 
 annotationInstances = [];
 
-annotationInstance = {
+currentAnnotationInstance = {
     url: currentOriginAndPath,
     annotations: []
 };
 
+// Annotations that have not been saved
+// TODO if the user leaves the page when this array is populated, alert are they sure they want to leave-
+draftAnnotations = [];
+
 // Create annotation object
 function CreateAnnotation(annotationData) {
-    let newAnnotation = {
-        ID: nextAnnotationId,
-        elementAuditID: annotationData.elementAuditID,
-        elementType: annotationData.elementType,
-        selectedText: annotationData.selectionText,
-        created: Date.now()
-    };
-
-    nextAnnotationId++;
-
-    cacheAnnotation(newAnnotation);
-
-    displayAnnotation(newAnnotation);
+    if (draftAnnotations.length > 0) {
+        alert('Please delete or save current draft');
+    } else {
+        let newAnnotation = {
+            ID: nextAnnotationId,
+            elementAuditID: annotationData.elementAuditID,
+            elementType: annotationData.elementType,
+            selectedText: annotationData.selectionText,
+            created: Date.now()
+        };
+    
+        draftAnnotations.push(newAnnotation);
+    
+        displayAnnotation(newAnnotation);
+    
+        //needs to be cached, can be done by pressing the save button
+    }
 }
 
 //Save annotation to cache (chrome sync storage) (TODO:before sending to remote storage)
@@ -37,11 +45,11 @@ function cacheAnnotation(newAnnotation) {
         return;
     }
 
-    annotationInstance.annotations.push(newAnnotation);
+    currentAnnotationInstance.annotations.push(newAnnotation);
 
     let message = {
         type: 'cacheInstance',
-        instance: annotationInstance
+        instance: currentAnnotationInstance
     };
 
     chrome.runtime.sendMessage(message);
@@ -57,10 +65,10 @@ function loadAnnotationsFromCache() {
             //Filter all instances stored in the browser and check if the current page already has an instance
             filteredInstances = annotationInstances.filter(instance => (instance.url === currentOriginAndPath));
             if (filteredInstances.length == 1) { // TODO: handle multiple instances of the same page, 
-                annotationInstance = filteredInstances[0];
+                currentAnnotationInstance = filteredInstances[0];
 
                 // for all annotations, load
-                annotationInstance.annotations.forEach(annotation => {
+                currentAnnotationInstance.annotations.forEach(annotation => {
                     displayAnnotation(annotation);
                 });
 
@@ -76,13 +84,32 @@ function getNextAnnotationID() {
     largestId = nextAnnotationId;
 
     // get the highest id from cached annotations
-    annotationInstance.annotations.forEach(annotation => {
+    currentAnnotationInstance.annotations.forEach(annotation => {
         if (annotation.ID > largestId) {
             largestId = annotation.ID;
         }
     });
 
     nextAnnotationId = ++largestId;
+}
+
+function SaveAnnotation(button) {
+    let annotationBox = button.srcElement.parentNode.parentNode;
+    let annotationId = parseInt(annotationBox.getAttribute('annotationId'));
+
+    // find the annotation
+    filteredAnnotations = draftAnnotations.filter(annotation => annotation.ID === annotationId);
+
+    if (filteredAnnotations.length != 1) {
+        console.log('Either too many annotations found or not any with the Id: ' + annotationId);
+    } else {
+        cacheAnnotation(filteredAnnotations[0]);
+        //Then upload to db
+        //Change annotation controls
+
+        // remove from drafts
+        draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
+    }
 }
 
 // show annotation 
@@ -96,12 +123,13 @@ function displayAnnotation(annotation) {
 
     // Allows the extension to work out what annotation button was pressed
     let annotationButton = clone.querySelector('.controls button');
-    annotationButton.addEventListener('click', function () {
-        SaveAnnotation();
+    annotationButton.addEventListener('click', function (annotation) {
+        SaveAnnotation(annotation);
     });
 
     let annotationBox = clone.querySelector('.commentBox');
     annotationBox.classList.add(randomColour());
+    annotationBox.setAttribute('annotationId', annotation.ID);
 
     // For demo populate annotation with selected text
     let annotationTextBox = clone.querySelector('textarea');
