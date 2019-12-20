@@ -1,8 +1,7 @@
 //Manage comments
 
 // for now default to 1, but in theory this would be read from a DB
-// plus should be appended to the comment container not the button?
-annotationId = 1;
+nextAnnotationId = 1;
 
 let currentOriginAndPath = window.location.origin + window.location.pathname;
 
@@ -16,12 +15,14 @@ annotationInstance = {
 // Create annotation object
 function CreateAnnotation(annotationData) {
     let newAnnotation = {
-        ID: 'No Id, this will be assigned by the database (also this string indicates the anno hasn\'nt been sent to the db yet and so should be cached if I do annotation caching)',
+        ID: nextAnnotationId,
         elementAuditID: annotationData.elementAuditID,
         elementType: annotationData.elementType,
         selectedText: annotationData.selectionText,
         created: Date.now()
     };
+
+    nextAnnotationId++;
 
     cacheAnnotation(newAnnotation);
 
@@ -52,16 +53,36 @@ function loadAnnotationsFromCache() {
     chrome.storage.sync.get(['annotationInstances'], function (result) {
         let annotationInstances = result.annotationInstances;
 
-        //Filter all instances stored in the browser and check if the current page already has an instance
-        filteredInstances = annotationInstances.filter(instance => (instance.url === currentOriginAndPath));
-        if (filteredInstances.length == 1) { // TODO: handle multiple instances of the same page, 
-            annotationInstance = filteredInstances[0];
+        if (annotationInstances !== undefined) {
+            //Filter all instances stored in the browser and check if the current page already has an instance
+            filteredInstances = annotationInstances.filter(instance => (instance.url === currentOriginAndPath));
+            if (filteredInstances.length == 1) { // TODO: handle multiple instances of the same page, 
+                annotationInstance = filteredInstances[0];
 
-            // for all annotations, load
-            annotationInstance.annotations.forEach(annotation => { displayAnnotation(annotation); });
+                // for all annotations, load
+                annotationInstance.annotations.forEach(annotation => {
+                    displayAnnotation(annotation);
+                });
+
+                // if annotations have been loaded, update the next id
+                getNextAnnotationID();
+            }
         }
-        // else no instance of this page has been annotated, so use the blank one
     });
+}
+
+// Get the next annotation ID if annotations are loaded from Cache (function will be removed when DB is implemented)
+function getNextAnnotationID() {
+    largestId = nextAnnotationId;
+
+    // get the highest id from cached annotations
+    annotationInstance.annotations.forEach(annotation => {
+        if (annotation.ID > largestId) {
+            largestId = annotation.ID;
+        }
+    });
+
+    nextAnnotationId = ++largestId;
 }
 
 // show annotation 
@@ -75,7 +96,6 @@ function displayAnnotation(annotation) {
 
     // Allows the extension to work out what annotation button was pressed
     let annotationButton = clone.querySelector('.controls button');
-    annotationId++;
     annotationButton.addEventListener('click', function () {
         SaveAnnotation();
     });
@@ -88,6 +108,7 @@ function displayAnnotation(annotation) {
 
     if (annotation !== undefined) {
         annotationText = 'Text selected "' + annotation.selectedText + '"' +
+            '\n and the annotation id is: ' + annotation.ID +
             '\n and the element type is: ' + annotation.elementType +
             '\n and the element id is: ' + annotation.elementAuditID +
             '\n and the element was created at: ' + annotation.created.toLocaleString();
