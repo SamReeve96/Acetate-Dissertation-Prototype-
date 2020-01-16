@@ -22,7 +22,7 @@ function CreateAnnotation(annotationData) {
         alert('Please delete or save current draft');
     } else {
         let newAnnotation = {
-            ID: nextAnnotationId,
+            ID: nextAnnotationId++,
             elementAuditID: annotationData.elementAuditID,
             elementType: annotationData.elementType,
             selectedText: annotationData.selectionText,
