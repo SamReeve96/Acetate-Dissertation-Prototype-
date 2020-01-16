@@ -20,6 +20,12 @@ function handleMessage(request) {
         case 'setNewContextElement':
             setContextElementData(request);
             break;
+        case 'cacheInstance':
+            cacheInstance(request.instance);
+            break;
+        case 'loadFromCache':
+            sendLoadFromCache(request.key);
+            break;
     }
 }
 
@@ -37,8 +43,6 @@ function sendChangeContainerState() {
         });
     });
 }
-
-//------------------------
 
 chrome.contextMenus.create( {
     id: "Annotate Element",
@@ -83,4 +87,44 @@ function sendCreateAnnotation(info, tab) {
 
 chrome.storage.sync.set({ darkModeByDefault: true }, function () {
     console.log("by default, the extension is in dark mode, because it's dark mode");
+});
+
+function cacheInstance(currentInstance) {
+    // get all the instances
+    chrome.storage.sync.get(['annotationInstances'], function (result) {
+        let annotationInstances = result.annotationInstances;
+
+        // if there are any instances
+        if (annotationInstances)
+        {
+            let filteredInstances = result.annotationInstances.filter(instance => (instance.url === currentInstance.url));
+
+            if (filteredInstances.length == 1) { // TODO: handle multiple instances of the same page, 
+                // update instances (remove old instance of url
+                annotationInstances = annotationInstances.filter(instance => (instance.url !== currentInstance.url));
+            }
+        } else {
+            annotationInstances = [];
+        }
+        // Add new url instance
+        annotationInstances.push(currentInstance);
+        // save new array of instances
+        chrome.storage.sync.set({
+            'annotationInstances': annotationInstances
+        });
+    });
+}
+
+// added for debugging storage changes
+// Or throw this at the console - chrome.storage.sync.get(null, function (data) { console.info(data) });
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+    for (var key in changes) {
+      var storageChange = changes[key];
+      console.log('Storage key "%s" in namespace "%s" changed. ' +
+                  'Old value was "%s", new value is "%s".',
+                  key,
+                  namespace,
+                  storageChange.oldValue,
+                  storageChange.newValue);
+    }
 });
