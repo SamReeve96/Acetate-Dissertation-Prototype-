@@ -298,12 +298,12 @@ function randomColour() {
 }
 
 function checkTheme() {
-    let commentsContainer = document.querySelector('commentsContainer');
+    let commentsContainer = document.querySelector('commentscontainer');
     return commentsContainer.classList.contains('dark');
 }
 
 function changeTheme() {
-    let commentsContainer = document.querySelector('commentsContainer');
+    let commentsContainer = document.querySelector('commentscontainer');
     let containerHeader = document.querySelector('#containerHeader');
     let commentTextAreas = [...document.getElementsByClassName('commentTextArea')];
 
