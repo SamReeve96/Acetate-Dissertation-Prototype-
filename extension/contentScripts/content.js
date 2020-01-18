@@ -93,7 +93,14 @@ function createCommentContainer() {
         '<h1 id=containerHeader >' +
             'Annotations' +
         '</h1>' +
-        '<div id=comments ></div>' +
+        '<div id="containerOptions">' +
+            '<button id="share">Share</button>' +
+            '<select id="annotationSort">' +
+                '<option value="Element">Sort by Element</option>' +
+                '<option value="Created">Sort by Created</option>' +
+            '</select>' +
+        '</div>' +
+        '<div id="comments" ></div>' +
     '</commentsContainer>' +
 
     '<template>' +
@@ -119,6 +126,11 @@ function createCommentContainer() {
     {
         changeTheme();
     }
+
+    let sortDropdown = document.querySelector('select#annotationSort');
+    sortDropdown.addEventListener('change', function () {
+        changeSort();
+    });
 }
 
 // Work out what element was right clicked

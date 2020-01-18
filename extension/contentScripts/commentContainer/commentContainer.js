@@ -16,6 +16,55 @@ currentAnnotationInstance = {
 // TODO if the user leaves the page when this array is populated, alert are they sure they want to leave-
 draftAnnotations = [];
 
+let annotationSort = 'Element';
+
+function changeSort() {
+    let sortOrder = document.querySelector('select#annotationSort').value;
+
+    if (annotationSort !== sortOrder)
+    {
+        annotationSort = sortOrder;
+        SortAnnotations();
+    }
+}
+
+function SortAnnotations() {
+
+    //Remove all html elements
+    let commentsElem = document.querySelector('div#comments');
+    while (commentsElem.firstChild) {
+        commentsElem.removeChild(commentsElem.firstChild);
+    }
+
+    if (annotationSort === 'Element') {
+        currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
+            if (annotation1.elementAuditID > annotation2.elementAuditID)
+            {
+                return 1;
+            }
+            if (annotation1.elementAuditID < annotation2.elementAuditID)
+            {
+                return -1;
+            }
+            if (annotation1.elementAuditID === annotation2.elementAuditID)
+            {
+                return annotation1.created - annotation2.created;
+            }
+        });
+    } else if (annotationSort === 'Created') {
+        currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
+            return annotation1.created - annotation2.created;
+        });
+    }
+
+    // redraw annotations
+    // for all annotations, load
+    currentAnnotationInstance.annotations.forEach(annotation => {
+        displayAnnotation(annotation);
+        setEditMode(annotation.ID, false);
+    });
+}
+
 // Create annotation object
 function CreateAnnotation(annotationData) {
     if (draftAnnotations.length > 0) {
@@ -46,6 +95,8 @@ function CreateAnnotation(annotationData) {
         draftAnnotations.push(newAnnotation);
     
         displayAnnotation(newAnnotation);
+
+        SortAnnotations();
     
         //needs to be cached, can be done by pressing the save button
     }
