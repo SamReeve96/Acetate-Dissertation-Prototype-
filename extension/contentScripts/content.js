@@ -49,7 +49,7 @@ function ChangeContainerState() {
 function LoadExtension() {
     addScriptsToPage();
     containPageContent();
-    auditElements();
+    AuditElements();
     createCommentContainer();
     loadAnnotationsFromCache();
 }
@@ -63,7 +63,7 @@ function UnloadExtension() {
 }
 
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
-function auditElements() {
+function AuditElements() {
     elementCounter = 1;
     elementsToAudit = document.getElementById('containedBody');
     elementsToAudit.querySelectorAll('*').forEach(function(element) {
@@ -83,6 +83,7 @@ function containPageContent() {
     document.body.innerHTML = '<div id="containedBody">' + document.body.innerHTML + '</div>';
 }
 
+//By default a comment box is in edit mode
 function createCommentContainer() {
     document.body.innerHTML = document.body.innerHTML +
     '<commentsContainer>' +
@@ -99,7 +100,12 @@ function createCommentContainer() {
             'If you\'re reading this, then the template was used incorrectly' +
             '</textarea> '+
             '<div class="controls">' +
-                '<button>Save Annotation</button>' +
+                '<button id="annotate">Annotate</button>' +
+                '<button id="update" class="hidden">Update Annotation</button>' +
+                '<button id="edit"   class="hidden">Edit Annotation</button>' +
+                '<button id="delete" class="hidden">Delete Annotation</button>' +
+                '<button id="thread" class="hidden">Toggle Thread</button>' +
+                '<button id="cancel">Cancel</button>' +
             '</div>' +
         '</div>' +
     '</template>';

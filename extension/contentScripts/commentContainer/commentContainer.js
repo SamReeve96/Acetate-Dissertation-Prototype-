@@ -21,6 +21,7 @@ function CreateAnnotation(annotationData) {
     if (draftAnnotations.length > 0) {
         alert('Please delete or save current draft');
     } else {
+        
         let newAnnotation = {
             ID: nextAnnotationId++,
             elementAuditID: annotationData.elementAuditID,
@@ -28,7 +29,20 @@ function CreateAnnotation(annotationData) {
             selectedText: annotationData.selectionText,
             created: Date.now()
         };
-    
+        
+        if (annotationData.comment === undefined)
+        {
+            // Debug default, newAnnotation needs to be got when the user saves a draft
+            // Then this can be set to "enter a comment here!" for instance
+            newAnnotation.comment = 'Text selected "' + newAnnotation.selectedText + '"' +
+            '\n and the annotation id is: ' + newAnnotation.ID +
+            '\n and the element type is: ' + newAnnotation.elementType +
+            '\n and the element id is: ' + newAnnotation.elementAuditID +
+            '\n and the element was created at: ' + newAnnotation.created.toLocaleString();
+        } else {
+            newAnnotation.comment = annotationData.comment;
+        }
+
         draftAnnotations.push(newAnnotation);
     
         displayAnnotation(newAnnotation);
@@ -37,16 +51,7 @@ function CreateAnnotation(annotationData) {
     }
 }
 
-//Save annotation to cache (chrome sync storage) (TODO:before sending to remote storage)
-function cacheAnnotation(newAnnotation) {
-    // Check that there's an annotation
-    if (!newAnnotation) {
-        //message('Error: No annotation data');
-        return;
-    }
-
-    currentAnnotationInstance.annotations.push(newAnnotation);
-
+function cacheInstance() {
     let message = {
         type: 'cacheInstance',
         instance: currentAnnotationInstance
@@ -70,6 +75,7 @@ function loadAnnotationsFromCache() {
                 // for all annotations, load
                 currentAnnotationInstance.annotations.forEach(annotation => {
                     displayAnnotation(annotation);
+                    setEditMode(annotation.ID, false);
                 });
 
                 // if annotations have been loaded, update the next id
@@ -93,22 +99,133 @@ function getNextAnnotationID() {
     nextAnnotationId = ++largestId;
 }
 
-function SaveAnnotation(button) {
-    let annotationBox = button.srcElement.parentNode.parentNode;
-    let annotationId = parseInt(annotationBox.getAttribute('annotationId'));
+function getIDFromButtonClick(clickEvent) {
+    let annotationBox = clickEvent.srcElement.parentNode.parentNode;
+    return parseInt(annotationBox.getAttribute('annotationId'));
+}
 
-    // find the annotation
+function setEditMode(annotationId, editMode = true) {
+    //Update Controls for that annotation
+    let annotateButton = document.querySelector('[annotationId="' + annotationId + '"] #annotate');
+    let updateButton = document.querySelector('[annotationId="' + annotationId + '"] #update');
+    let deleteButton = document.querySelector('[annotationId="' + annotationId + '"] #delete');
+    let editButton = document.querySelector('[annotationId="' + annotationId + '"] #edit');
+    let threadButton = document.querySelector('[annotationId="' + annotationId + '"] #thread');
+    let cancelButton = document.querySelector('[annotationId="' + annotationId + '"] #cancel');
+    let commentBox = document.querySelector('[annotationId="' + annotationId + '"] textarea');
+
+    //Only visible in draft state
+    annotateButton.classList.add('hidden');
+    updateButton.classList.remove('hidden');
+    deleteButton.classList.remove('hidden');
+    editButton.classList.remove('hidden');
+    threadButton.classList.remove('hidden');
+    cancelButton.classList.remove('hidden');
+    commentBox.disabled = true;
+
+    //Entering edit mode
+    if (editMode) {
+        deleteButton.classList.add('hidden');
+        editButton.classList.add('hidden');
+        threadButton.classList.add('hidden');
+        commentBox.disabled = false;
+    } else { // leaving edit mode
+        updateButton.classList.add('hidden');
+        cancelButton.classList.add('hidden');
+    }
+
+}
+
+function SaveAnnotation(buttonClick) {
+    let annotationId =  getIDFromButtonClick(buttonClick);
+
+    // find the draft annotation
     filteredAnnotations = draftAnnotations.filter(annotation => annotation.ID === annotationId);
 
     if (filteredAnnotations.length != 1) {
         console.log('Either too many annotations found or not any with the Id: ' + annotationId);
     } else {
-        cacheAnnotation(filteredAnnotations[0]);
+        //The annotation currently in drafts that will be moved to the instance array
+        let annotationToSave = filteredAnnotations[0];
+        annotationToSave.comment = document.querySelector('[annotationId="' + annotationId + '"] textarea').value;
+        currentAnnotationInstance.annotations.push(annotationToSave);
+        cacheInstance();
         //Then upload to db
-        //Change annotation controls
 
         // remove from drafts
         draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
+
+    setEditMode(annotationId, false);
+
+    }
+}
+
+function DeleteAnnotation(buttonClick) {
+    let annotationId =  getIDFromButtonClick(buttonClick);
+
+    // find the annotation
+    filteredAnnotations = currentAnnotationInstance.annotations.filter(annotation => annotation.ID === annotationId);
+
+    if (filteredAnnotations.length != 1) {
+        console.log('Either too many annotations found or not any with the Id: ' + annotationId);
+    } else {
+        // remove from cache
+        currentAnnotationInstance.annotations = currentAnnotationInstance.annotations.filter(annotation => annotation.ID !== annotationId);
+        cacheInstance();
+
+        //Then remove from DB
+    }
+
+    // Remove html element
+    let annotationElement = document.querySelector('[annotationId="' + annotationId + '"]');
+    annotationElement.parentNode.removeChild(annotationElement);
+}
+
+function EditAnnotation(buttonClick) {
+    let annotationId =  getIDFromButtonClick(buttonClick);
+    setEditMode(annotationId);
+}
+
+function UpdateAnnotation(buttonClick) {
+    let annotationId =  getIDFromButtonClick(buttonClick);
+    //find the annotation in the cache and update it's attributes
+    annotationIndex = currentAnnotationInstance.annotations.findIndex(annotation => annotation.ID === annotationId);
+
+    if (annotationIndex >= 0) {
+        annotationToUpdate = currentAnnotationInstance.annotations[annotationIndex];
+        //right now editing just the annotation comment
+        let annotationText = document.querySelector('[annotationId="' + annotationId + '"] textarea').value;
+        annotationToUpdate.comment = annotationText;
+        annotationToUpdate.lastUpdated = Date.now();
+
+        currentAnnotationInstance.annotations[annotationIndex] = annotationToUpdate;
+        cacheInstance();
+
+        setEditMode(annotationId, false);
+    }
+}
+
+function ToggleThread(buttonClick) {
+    alert('Functionality Coming Soon! Pester me at: https://github.com/SamReeve96/Acetate/ To get me to implement it sooner!');
+}
+
+function CancelAnnotation(buttonClick) {
+    let annotationId =  getIDFromButtonClick(buttonClick);
+
+    annotationIsADraft = draftAnnotations.filter(annotation => annotation.ID === annotationId).length === 1;
+
+    //Determine if an edit cancellation or draft cancellation
+    if (annotationIsADraft) {
+        // remove from drafts
+        draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
+        //remove draft element
+        let annotationElement = document.querySelector('[annotationId="' + annotationId + '"]');
+        annotationElement.parentNode.removeChild(annotationElement);
+    } else {
+        //Reset commentBox value
+        annotationIndex = currentAnnotationInstance.annotations.findIndex(annotation => annotation.ID === annotationId);
+        document.querySelector('[annotationId="' + annotationId + '"] textarea').value = currentAnnotationInstance.annotations[annotationIndex].comment;
+        setEditMode(annotationId, false);
     }
 }
 
@@ -117,14 +234,39 @@ function displayAnnotation(annotation) {
     let commentsDiv = document.querySelector('div#comments');
     let commentBoxTemplate = document.querySelector('template');
 
-
     //Create new comment instance
     let clone = document.importNode(commentBoxTemplate.content, true);
 
     // Allows the extension to work out what annotation button was pressed
-    let annotationButton = clone.querySelector('.controls button');
-    annotationButton.addEventListener('click', function (annotation) {
+    let saveButton = clone.querySelector('button#annotate');
+    saveButton.addEventListener('click', function (annotation) {
         SaveAnnotation(annotation);
+    });
+
+    let editButton = clone.querySelector('button#edit');
+    editButton.addEventListener('click', function (annotation) {
+        EditAnnotation(annotation);
+    });
+
+    let deleteButton = clone.querySelector('button#delete');
+    deleteButton.addEventListener('click', function (annotation) {
+        DeleteAnnotation(annotation);
+    });
+
+    let threadButton = clone.querySelector('button#thread');
+    threadButton.addEventListener('click', function (annotation) {
+        ToggleThread(annotation);
+    });
+
+    let cancelButton = clone.querySelector('button#cancel');
+    cancelButton.addEventListener('click', function (annotation) {
+        CancelAnnotation(annotation);
+    });
+
+    
+    let updateButton = clone.querySelector('button#update');
+    updateButton.addEventListener('click', function (annotation) {
+        UpdateAnnotation(annotation);
     });
 
     let annotationBox = clone.querySelector('.commentBox');
@@ -134,17 +276,7 @@ function displayAnnotation(annotation) {
     // For demo populate annotation with selected text
     let annotationTextBox = clone.querySelector('textarea');
 
-    if (annotation !== undefined) {
-        annotationText = 'Text selected "' + annotation.selectedText + '"' +
-            '\n and the annotation id is: ' + annotation.ID +
-            '\n and the element type is: ' + annotation.elementType +
-            '\n and the element id is: ' + annotation.elementAuditID +
-            '\n and the element was created at: ' + annotation.created.toLocaleString();
-    } else {
-        annotationText = 'No data, error?';
-    }
-
-    annotationTextBox.innerHTML = annotationText;
+    annotationTextBox.value = annotation.comment;
 
     // apply theme styles if needed
     let isInDarkMode = checkTheme();
@@ -166,12 +298,12 @@ function randomColour() {
 }
 
 function checkTheme() {
-    let commentsContainer = document.querySelector('commentscontainer');
+    let commentsContainer = document.querySelector('commentsContainer');
     return commentsContainer.classList.contains('dark');
 }
 
 function changeTheme() {
-    let commentsContainer = document.querySelector('commentscontainer');
+    let commentsContainer = document.querySelector('commentsContainer');
     let containerHeader = document.querySelector('#containerHeader');
     let commentTextAreas = [...document.getElementsByClassName('commentTextArea')];
 
