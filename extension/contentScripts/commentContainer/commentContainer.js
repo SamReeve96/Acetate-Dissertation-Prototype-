@@ -21,21 +21,18 @@ let annotationSort = 'Element';
 function changeSort() {
     let sortOrder = document.querySelector('select#annotationSort').value;
 
-    if (annotationSort !== sortOrder)
-    {
+    if (draftAnnotations.length > 0) {
+        alert('Please delete or save current draft');
+        document.querySelector('select#annotationSort').value = annotationSort;
+    } else if (currentAnnotationInstance.annotations.length < 1) {
+        alert('Nothing to sort... Annotate some things first!');
+        document.querySelector('select#annotationSort').value = annotationSort;
+    } else {
         annotationSort = sortOrder;
         SortAnnotations();
     }
 }
-
-function SortAnnotations() {
-
-    //Remove all html elements
-    let commentsElem = document.querySelector('div#comments');
-    while (commentsElem.firstChild) {
-        commentsElem.removeChild(commentsElem.firstChild);
-    }
-
+function SortAnnotations(redrawAnnotations = true) {
     if (annotationSort === 'Element') {
         currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
             if (annotation1.elementAuditID > annotation2.elementAuditID)
@@ -57,16 +54,25 @@ function SortAnnotations() {
         });
     }
 
-    // redraw annotations
-    // for all annotations, load
-    currentAnnotationInstance.annotations.forEach(annotation => {
-        displayAnnotation(annotation);
-        setEditMode(annotation.ID, false);
-    });
+    if (redrawAnnotations) {
+        //Remove all annotation template elements
+        let commentsElem = document.querySelector('div#comments');
+        while (commentsElem.firstChild) {
+            commentsElem.removeChild(commentsElem.firstChild);
+        }
+
+        // redraw annotations
+        // for all annotations, load
+        currentAnnotationInstance.annotations.forEach(annotation => {
+            displayAnnotation(annotation);
+            setEditMode(annotation.ID, false);
+        });
+    }
+
 }
 
 // Create annotation object
-function CreateAnnotation(annotationData) {
+function CreateDraftAnnotation(annotationData) {
     if (draftAnnotations.length > 0) {
         alert('Please delete or save current draft');
     } else {
@@ -93,12 +99,8 @@ function CreateAnnotation(annotationData) {
         }
 
         draftAnnotations.push(newAnnotation);
-    
-        displayAnnotation(newAnnotation);
 
-        SortAnnotations();
-    
-        //needs to be cached, can be done by pressing the save button
+        displayAnnotation(newAnnotation);
     }
 }
 
@@ -206,8 +208,9 @@ function SaveAnnotation(buttonClick) {
         // remove from drafts
         draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
 
-    setEditMode(annotationId, false);
+        setEditMode(annotationId, false);
 
+        SortAnnotations();
     }
 }
 

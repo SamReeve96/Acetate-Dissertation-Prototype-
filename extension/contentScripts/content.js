@@ -18,7 +18,7 @@ function handleMessage(request) {
             ChangeContainerState();
             break;
         case 'createAnnotation':
-            CreateAnnotation(request.content);
+            CreateDraftAnnotation(request.content);
             break;
         case 'changeTheme':
             changeTheme();
