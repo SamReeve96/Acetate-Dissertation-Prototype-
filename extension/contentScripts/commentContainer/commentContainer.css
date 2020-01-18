@@ -79,3 +79,13 @@ commentsContainer {
 .hidden {
     display: none;
 }
+
+#containerOptions {
+    margin: auto;
+    width: 80%;
+}
+
+#containerOptions > select, #containerOptions > button {
+    display: block;
+    margin: auto;
+}
