@@ -6,6 +6,10 @@ let containerStateActive = false;
 // Check if the comments panel should be in dark mode by default
 let darkModeByDefault;
 
+chrome.storage.sync.get('darkModeByDefault', function (data) {
+    darkModeByDefault = data.darkModeByDefault;
+});
+
 // add listener for messages from backend
 chrome.extension.onMessage.addListener(handleMessage);
 function handleMessage(request) {
@@ -16,12 +20,11 @@ function handleMessage(request) {
         case 'createAnnotation':
             CreateAnnotation(request.content);
             break;
+        case 'changeTheme':
+            changeTheme();
+            break;
     }
 }
-
-chrome.storage.sync.get('darkModeByDefault', function (data) {
-    darkModeByDefault = data.darkModeByDefault;
-});
 
 // open the comment window and contain content on page load
 chrome.storage.sync.get('activeOnPageLoad', function (data) {
@@ -89,7 +92,6 @@ function createCommentContainer() {
     '<commentsContainer>' +
         '<h1 id=containerHeader >' +
             'Annotations' +
-            '<button id="darkMode">darkMode</button>' +
         '</h1>' +
         '<div id=comments ></div>' +
     '</commentsContainer>' +
@@ -110,18 +112,13 @@ function createCommentContainer() {
         '</div>' +
     '</template>';
 
-    let darkModeButton = document.querySelector('#darkMode');
-    darkModeButton.addEventListener('click', function() {
-        changeTheme();
-    });
+    document.body.id = 'alteredBody';
 
     // if the user has set the theme to be dark mode by default, change to dark mode
     if (darkModeByDefault) 
     {
         changeTheme();
     }
-
-    document.body.id = 'alteredBody';
 }
 
 // Work out what element was right clicked
