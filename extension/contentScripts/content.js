@@ -51,7 +51,7 @@ function ChangeContainerState() {
 
 function LoadExtension() {
     addScriptsToPage();
-    containPageContent();
+    //containPageContent();
     AuditElements();
     createCommentContainer();
     loadAnnotationsFromCache();
@@ -68,7 +68,7 @@ function UnloadExtension() {
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
 function AuditElements() {
     elementCounter = 1;
-    elementsToAudit = document.getElementById('containedBody');
+    elementsToAudit = document.querySelector('body');
     elementsToAudit.querySelectorAll('*').forEach(function(element) {
         element.setAttribute('element_audit_id', elementCounter);
         elementCounter++;
@@ -90,17 +90,14 @@ function containPageContent() {
 function createCommentContainer() {
     document.body.innerHTML = document.body.innerHTML +
     '<commentsContainer>' +
-        '<h1 id=containerHeader >' +
-            'Annotations' +
-        '</h1>' +
-        '<div id="containerOptions">' +
-            '<button id="share">Share</button>' +
-            '<select id="annotationSort">' +
-                '<option value="Element">Sort by Element</option>' +
-                '<option value="Created">Sort by Created</option>' +
-            '</select>' +
-        '</div>' +
-        '<div id="comments" ></div>' +
+    //Hidden controls for now, will in the future move to popup js
+        // '<div id="containerOptions">' +
+        //     '<button id="share">Share</button>' +
+        //     '<select id="annotationSort">' +
+        //         '<option value="Element">Sort by Element</option>' +
+        //         '<option value="Created">Sort by Created</option>' +
+        //     '</select>' +
+        // '</div>' +
     '</commentsContainer>' +
 
     '<template>' +
@@ -127,10 +124,10 @@ function createCommentContainer() {
         changeTheme();
     }
 
-    let sortDropdown = document.querySelector('select#annotationSort');
-    sortDropdown.addEventListener('change', function () {
-        changeSort();
-    });
+    // let sortDropdown = document.querySelector('select#annotationSort');
+    // sortDropdown.addEventListener('change', function () {
+    //     changeSort();
+    // });
 }
 
 // Work out what element was right clicked

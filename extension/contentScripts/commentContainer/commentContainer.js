@@ -16,60 +16,61 @@ currentAnnotationInstance = {
 // TODO if the user leaves the page when this array is populated, alert are they sure they want to leave-
 draftAnnotations = [];
 
-let annotationSort = 'Element';
+// let annotationSort = 'Element';
 
-function changeSort() {
-    let sortOrder = document.querySelector('select#annotationSort').value;
+// function changeSort() {
+//     let sortOrder = document.querySelector('select#annotationSort').value;
 
-    if (draftAnnotations.length > 0) {
-        alert('Please delete or save current draft');
-        document.querySelector('select#annotationSort').value = annotationSort;
-    } else if (currentAnnotationInstance.annotations.length < 1) {
-        alert('Nothing to sort... Annotate some things first!');
-        document.querySelector('select#annotationSort').value = annotationSort;
-    } else {
-        annotationSort = sortOrder;
-        SortAnnotations();
-    }
-}
-function SortAnnotations(redrawAnnotations = true) {
-    if (annotationSort === 'Element') {
-        currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
-            if (annotation1.elementAuditID > annotation2.elementAuditID)
-            {
-                return 1;
-            }
-            if (annotation1.elementAuditID < annotation2.elementAuditID)
-            {
-                return -1;
-            }
-            if (annotation1.elementAuditID === annotation2.elementAuditID)
-            {
-                return annotation1.created - annotation2.created;
-            }
-        });
-    } else if (annotationSort === 'Created') {
-        currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
-            return annotation1.created - annotation2.created;
-        });
-    }
+//     if (draftAnnotations.length > 0) {
+//         alert('Please delete or save current draft');
+//         document.querySelector('select#annotationSort').value = annotationSort;
+//     } else if (currentAnnotationInstance.annotations.length < 1) {
+//         alert('Nothing to sort... Annotate some things first!');
+//         document.querySelector('select#annotationSort').value = annotationSort;
+//     } else {
+//         annotationSort = sortOrder;
+//         SortAnnotations();
+//     }
+// }
 
-    if (redrawAnnotations) {
-        //Remove all annotation template elements
-        let commentsElem = document.querySelector('div#comments');
-        while (commentsElem.firstChild) {
-            commentsElem.removeChild(commentsElem.firstChild);
-        }
+// function SortAnnotations(redrawAnnotations = true) {
+//     if (annotationSort === 'Element') {
+//         currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
+//             if (annotation1.elementAuditID > annotation2.elementAuditID)
+//             {
+//                 return 1;
+//             }
+//             if (annotation1.elementAuditID < annotation2.elementAuditID)
+//             {
+//                 return -1;
+//             }
+//             if (annotation1.elementAuditID === annotation2.elementAuditID)
+//             {
+//                 return annotation1.created - annotation2.created;
+//             }
+//         });
+//     } else if (annotationSort === 'Created') {
+//         currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
+//             return annotation1.created - annotation2.created;
+//         });
+//     }
 
-        // redraw annotations
-        // for all annotations, load
-        currentAnnotationInstance.annotations.forEach(annotation => {
-            displayAnnotation(annotation);
-            setEditMode(annotation.ID, false);
-        });
-    }
+//     if (redrawAnnotations) {
+//         //Remove all annotation template elements
+//         let commentsElem = document.querySelector('commentscontainer');
+//         while (commentsElem.firstChild) {
+//             commentsElem.removeChild(commentsElem.firstChild);
+//         }
 
-}
+//         // redraw annotations
+//         // for all annotations, load
+//         currentAnnotationInstance.annotations.forEach(annotation => {
+//             displayAnnotation(annotation);
+//             setEditMode(annotation.ID, false);
+//         });
+//     }
+
+// }
 
 // Create annotation object
 function CreateDraftAnnotation(annotationData) {
@@ -285,7 +286,7 @@ function CancelAnnotation(buttonClick) {
 
 // show annotation 
 function displayAnnotation(annotation) {
-    let commentsDiv = document.querySelector('div#comments');
+    let commentsDiv = document.querySelector('commentscontainer');
     let commentBoxTemplate = document.querySelector('template');
 
     //Create new comment instance
@@ -358,7 +359,6 @@ function checkTheme() {
 
 function changeTheme() {
     let commentsContainer = document.querySelector('commentscontainer');
-    let containerHeader = document.querySelector('#containerHeader');
     let commentTextAreas = [...document.getElementsByClassName('commentTextArea')];
 
     let isInDarkMode = checkTheme();
@@ -366,7 +366,6 @@ function changeTheme() {
     if (isInDarkMode) {
         // remove dark mode classes
         commentsContainer.classList.remove('dark');
-        containerHeader.classList.remove('dark');
         commentTextAreas.forEach(cta => {
             cta.classList.remove('dark');
         });
@@ -374,7 +373,6 @@ function changeTheme() {
     } else {
         // add dark mode classes
         commentsContainer.classList.add('dark');
-        containerHeader.classList.add('dark');
         commentTextAreas.forEach(cta => cta.classList.add('dark'));
     }
 }
