@@ -40,9 +40,7 @@ chrome.storage.sync.get('activeOnPageLoad', function (data) {
 });
 
 function ChangeContainerState() {
-    if (containerStateActive) {
-        UnloadExtension();
-    } else {
+    if (!containerStateActive) {
         LoadExtension();
     }
 
@@ -55,14 +53,6 @@ function LoadExtension() {
     AuditElements();
     createCommentContainer();
     loadAnnotationsFromCache();
-}
-
-function UnloadExtension() {
-    // container is active so release the content
-    let originalPageContentsElem = document.getElementById('containedBody');
-    let originalPageContents = originalPageContentsElem.innerHTML;
-    document.body.innerHTML = originalPageContents;
-    document.body.removeAttribute("id");
 }
 
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
@@ -90,6 +80,9 @@ function containPageContent() {
 function createCommentContainer() {
     document.body.innerHTML = document.body.innerHTML +
     '<commentsContainer>' +
+
+
+
     //Hidden controls for now, will in the future move to popup js
         // '<div id="containerOptions">' +
         //     '<button id="share">Share</button>' +
@@ -98,6 +91,9 @@ function createCommentContainer() {
         //         '<option value="Created">Sort by Created</option>' +
         //     '</select>' +
         // '</div>' +
+
+
+        
     '</commentsContainer>' +
 
     '<template>' +

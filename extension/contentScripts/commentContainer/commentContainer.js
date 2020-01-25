@@ -16,61 +16,60 @@ currentAnnotationInstance = {
 // TODO if the user leaves the page when this array is populated, alert are they sure they want to leave-
 draftAnnotations = [];
 
-// let annotationSort = 'Element';
+let annotationSort = 'Element';
 
-// function changeSort() {
-//     let sortOrder = document.querySelector('select#annotationSort').value;
+function changeSort() {
+    let sortOrder = document.querySelector('select#annotationSort').value;
 
-//     if (draftAnnotations.length > 0) {
-//         alert('Please delete or save current draft');
-//         document.querySelector('select#annotationSort').value = annotationSort;
-//     } else if (currentAnnotationInstance.annotations.length < 1) {
-//         alert('Nothing to sort... Annotate some things first!');
-//         document.querySelector('select#annotationSort').value = annotationSort;
-//     } else {
-//         annotationSort = sortOrder;
-//         SortAnnotations();
-//     }
-// }
+    if (draftAnnotations.length > 0) {
+        alert('Please delete or save current draft');
+        document.querySelector('select#annotationSort').value = annotationSort;
+    } else if (currentAnnotationInstance.annotations.length < 1) {
+        alert('Nothing to sort... Annotate some things first!');
+        document.querySelector('select#annotationSort').value = annotationSort;
+    } else {
+        annotationSort = sortOrder;
+        SortAnnotations();
+    }
+}
 
-// function SortAnnotations(redrawAnnotations = true) {
-//     if (annotationSort === 'Element') {
-//         currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
-//             if (annotation1.elementAuditID > annotation2.elementAuditID)
-//             {
-//                 return 1;
-//             }
-//             if (annotation1.elementAuditID < annotation2.elementAuditID)
-//             {
-//                 return -1;
-//             }
-//             if (annotation1.elementAuditID === annotation2.elementAuditID)
-//             {
-//                 return annotation1.created - annotation2.created;
-//             }
-//         });
-//     } else if (annotationSort === 'Created') {
-//         currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
-//             return annotation1.created - annotation2.created;
-//         });
-//     }
+function SortAnnotations(redrawAnnotations = true) {
+    if (annotationSort === 'Element') {
+        currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
+            if (annotation1.elementAuditID > annotation2.elementAuditID)
+            {
+                return 1;
+            }
+            if (annotation1.elementAuditID < annotation2.elementAuditID)
+            {
+                return -1;
+            }
+            if (annotation1.elementAuditID === annotation2.elementAuditID)
+            {
+                return annotation1.created - annotation2.created;
+            }
+        });
+    } else if (annotationSort === 'Created') {
+        currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
+            return annotation1.created - annotation2.created;
+        });
+    }
 
-//     if (redrawAnnotations) {
-//         //Remove all annotation template elements
-//         let commentsElem = document.querySelector('commentscontainer');
-//         while (commentsElem.firstChild) {
-//             commentsElem.removeChild(commentsElem.firstChild);
-//         }
+    if (redrawAnnotations) {
+        //Remove all annotation template elements
+        let commentsElem = document.querySelector('commentscontainer');
+        while (commentsElem.firstChild) {
+            commentsElem.removeChild(commentsElem.firstChild);
+        }
 
-//         // redraw annotations
-//         // for all annotations, load
-//         currentAnnotationInstance.annotations.forEach(annotation => {
-//             displayAnnotation(annotation);
-//             setEditMode(annotation.ID, false);
-//         });
-//     }
-
-// }
+        // redraw annotations
+        // for all annotations, load
+        currentAnnotationInstance.annotations.forEach(annotation => {
+            displayAnnotation(annotation);
+            setEditMode(annotation.ID, false);
+        });
+    }
+}
 
 // Create annotation object
 function CreateDraftAnnotation(annotationData) {
@@ -318,7 +317,6 @@ function displayAnnotation(annotation) {
         CancelAnnotation(annotation);
     });
 
-    
     let updateButton = clone.querySelector('button#update');
     updateButton.addEventListener('click', function (annotation) {
         UpdateAnnotation(annotation);
