@@ -3,12 +3,11 @@ commentsContainer {
     font-family: 'roboto', arial;
     height: 100%;
     margin: auto;
-    max-width: 500px;
     min-height: 100vh;
-    min-width: 300px;
     position: absolute;
-    right: -350px;
-    width: 33vw;
+    right: -335px;
+    top: 0px;
+    width: 350px;
     z-index: 9001;
 
 }
@@ -17,12 +16,35 @@ commentsContainer {
     background-color: rgb(53, 53, 53);
     display: flex;
     margin-bottom: 5px;
+    /* margin-left: -10px; */
     max-width: 100%;
-    padding: 3px;
+    padding: 5px;
+    padding-left: 20px;
+
+    transition: all 0.25s ease-in-out;
+    -webkit-transition: all 0.25s ease-in-out; /** Chrome & Safari **/
+    -moz-transition: all 0.25s ease-in-out; /** Firefox **/
+    -o-transition: all 0.25s ease-in-out; /** Opera **/
+}
+
+.commentBox.slideOut {
+    /* margin-left: -385px; */
+    transform: translate(-335px,0);
+    -webkit-transform: translate(-335px,0); /** Chrome & Safari **/
+    -o-transform: translate(-335px,0); /** Opera **/
+    -moz-transform: translate(-335px,0); /** Firefox **/
 }
 
 .commentBox:hover {
-    margin-left: -350px;
+    /* margin-left: -385px; */
+    transform: translate(-335px,0);
+    -webkit-transform: translate(-335px,0); /** Chrome & Safari **/
+    -o-transform: translate(-335px,0); /** Opera **/
+    -moz-transform: translate(-335px,0); /** Firefox **/
+}
+
+.commentBox.default {
+    background-color: #f3936ecf;
 }
 
 .commentBox.pink {

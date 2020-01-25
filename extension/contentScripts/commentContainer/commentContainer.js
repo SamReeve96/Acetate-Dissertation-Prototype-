@@ -349,7 +349,8 @@ function randomColour() {
     max = colors.length;
     let randomIndex = Math.floor(Math.random() * (max - min)) + min;
 
-    return colors[randomIndex];
+    //Making default permanent for now, will remove randomisation and make colours indicative of urgency/purpose/user set in another issue
+    return 'default';
 }
 
 function checkTheme() {
