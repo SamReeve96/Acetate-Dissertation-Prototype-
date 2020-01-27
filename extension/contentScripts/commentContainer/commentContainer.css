@@ -5,62 +5,34 @@ commentsContainer {
     margin: auto;
     min-height: 100vh;
     position: absolute;
-    right: -335px;
+    right: -320 px;
     top: 0px;
     width: 350px;
     z-index: 9001;
-
 }
 
 .commentBox {
     background-color: rgb(53, 53, 53);
     display: flex;
     margin-bottom: 5px;
-    /* margin-left: -10px; */
-    max-width: 100%;
+    width: 100%;
     padding: 5px;
-    padding-left: 20px;
-
+    padding-left: 30px;
     transition: all 0.25s ease-in-out;
-    -webkit-transition: all 0.25s ease-in-out; /** Chrome & Safari **/
-    -moz-transition: all 0.25s ease-in-out; /** Firefox **/
-    -o-transition: all 0.25s ease-in-out; /** Opera **/
+        -webkit-transition: all 0.25s ease-in-out; /** Chrome & Safari **/
+        -moz-transition: all 0.25s ease-in-out; /** Firefox **/
+        -o-transition: all 0.25s ease-in-out; /** Opera **/
 }
 
-.commentBox.slideOut {
-    /* margin-left: -385px; */
-    transform: translate(-335px,0);
-    -webkit-transform: translate(-335px,0); /** Chrome & Safari **/
-    -o-transform: translate(-335px,0); /** Opera **/
-    -moz-transform: translate(-335px,0); /** Firefox **/
+.commentBox.slideOut, .commentBox:hover {
+    transform: translate(-365px,0);
+    -webkit-transform: translate(-365px,0); /** Chrome & Safari **/
+    -o-transform: translate(-365px,0); /** Opera **/
+    -moz-transform: translate(-365px,0); /** Firefox **/
 }
 
-.commentBox:hover {
-    /* margin-left: -385px; */
-    transform: translate(-335px,0);
-    -webkit-transform: translate(-335px,0); /** Chrome & Safari **/
-    -o-transform: translate(-335px,0); /** Opera **/
-    -moz-transform: translate(-335px,0); /** Firefox **/
-}
-
-.commentBox.default {
+.commentBox.default, .annotatedElem {
     background-color: #f3936ecf;
-}
-
-.commentBox.pink {
-    background-color: fuchsia;
-}
-
-.commentBox.yellow {
-    background-color: yellow;
-}
-
-.commentBox.cyan {
-    background-color: cyan;
-}
-
-.commentBox.green {
-    background-color: greenyellow;
 }
 
 .commentTextArea {
