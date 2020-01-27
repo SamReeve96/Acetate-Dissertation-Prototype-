@@ -5,9 +5,9 @@ commentsContainer {
     margin: auto;
     min-height: 100vh;
     position: absolute;
-    right: -320 px;
+    right: -370px;
     top: 0px;
-    width: 350px;
+    width: 400px;
     z-index: 9001;
 }
 
@@ -15,9 +15,8 @@ commentsContainer {
     background-color: rgb(53, 53, 53);
     display: flex;
     margin-bottom: 5px;
-    width: 100%;
-    padding: 5px;
-    padding-left: 30px;
+    max-width: 100%;
+    padding: 5px 25px 5px 30px;
     transition: all 0.25s ease-in-out;
         -webkit-transition: all 0.25s ease-in-out; /** Chrome & Safari **/
         -moz-transition: all 0.25s ease-in-out; /** Firefox **/
@@ -25,10 +24,10 @@ commentsContainer {
 }
 
 .commentBox.slideOut, .commentBox:hover {
-    transform: translate(-365px,0);
-    -webkit-transform: translate(-365px,0); /** Chrome & Safari **/
-    -o-transform: translate(-365px,0); /** Opera **/
-    -moz-transform: translate(-365px,0); /** Firefox **/
+    transform: translate(-360px,0);
+    -webkit-transform: translate(-360px,0); /** Chrome & Safari **/
+    -o-transform: translate(-360px,0); /** Opera **/
+    -moz-transform: translate(-360px,0); /** Firefox **/
 }
 
 .commentBox.default, .annotatedElem {
