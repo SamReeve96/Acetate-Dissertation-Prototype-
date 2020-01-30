@@ -141,38 +141,4 @@ document.addEventListener("mousedown", function(event){
     }
 }, true);
 
-document.addEventListener('keydown', HandleKeyDown);
-document.addEventListener('keyup', HandleKeyUp);
-let pressedKeys = [];
-
-function HandleKeyDown(keyPress) {
-    pressedKeys[keyPress.key] = true;
-    keyChange();
-}
-
-function HandleKeyUp(keyPress) {
-    pressedKeys[keyPress.key] = false;
-    keyChange();
-}
-
-function keyChange() {
-    if (pressedKeys.altKey && pressedKeys.o) {
-        SlideOutCards();
-    } else {
-        SlideBackCards();
-    }
-}
-
-function SlideOutCards() {
-    let commentsContainerElem = document.querySelector('commentscontainer');
-
-    commentsContainerElem.children.forEach(annotation => annotation.classlist.add('slideOut'));
-}
-
-function SlideBackCards() {
-    let commentsContainerElem = document.querySelector('commentscontainer');
-
-    commentsContainerElem.children.forEach(annotation => annotation.classlist.remove('slideOut'));
-}
-
 console.log('ready for lift off');
