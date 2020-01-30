@@ -32,6 +32,7 @@ function changeSort() {
         SortAnnotations();
     }
 }
+
 function SortAnnotations(redrawAnnotations = true) {
     if (annotationSort === 'Element') {
         currentAnnotationInstance.annotations.sort(function (annotation1, annotation2) {
@@ -56,7 +57,7 @@ function SortAnnotations(redrawAnnotations = true) {
 
     if (redrawAnnotations) {
         //Remove all annotation template elements
-        let commentsElem = document.querySelector('div#comments');
+        let commentsElem = document.querySelector('commentscontainer');
         while (commentsElem.firstChild) {
             commentsElem.removeChild(commentsElem.firstChild);
         }
@@ -68,7 +69,6 @@ function SortAnnotations(redrawAnnotations = true) {
             setEditMode(annotation.ID, false);
         });
     }
-
 }
 
 // Create annotation object
@@ -210,9 +210,26 @@ function SaveAnnotation(buttonClick) {
 
         setEditMode(annotationId, false);
 
+        //Add hover event trigger to annotated elem
+        attachAnnotatedElementTrigger(annotationId, annotationToSave.elementAuditID, annotationToSave.selectionText);
+
         SortAnnotations();
     }
 }
+
+//selectionText is unused for now
+//Style and attach a hover event
+function attachAnnotatedElementTrigger(annotationId, elementAuditID, selectionText) {
+    let annotatedElem = document.querySelector('[element_audit_id="' + annotationId + '"]');
+    let annotationBox = document.querySelector('[annotationid="' + annotationId + '"]');
+
+    //Style
+
+
+    //Attach trigger
+
+}
+
 
 function DeleteAnnotation(buttonClick) {
     let annotationId =  getIDFromButtonClick(buttonClick);
@@ -285,7 +302,7 @@ function CancelAnnotation(buttonClick) {
 
 // show annotation 
 function displayAnnotation(annotation) {
-    let commentsDiv = document.querySelector('div#comments');
+    let commentsDiv = document.querySelector('commentscontainer');
     let commentBoxTemplate = document.querySelector('template');
 
     //Create new comment instance
@@ -317,14 +334,13 @@ function displayAnnotation(annotation) {
         CancelAnnotation(annotation);
     });
 
-    
     let updateButton = clone.querySelector('button#update');
     updateButton.addEventListener('click', function (annotation) {
         UpdateAnnotation(annotation);
     });
 
     let annotationBox = clone.querySelector('.commentBox');
-    annotationBox.classList.add(randomColour());
+    annotationBox.classList.add('default');
     annotationBox.setAttribute('annotationId', annotation.ID);
 
     // For demo populate annotation with selected text
@@ -342,15 +358,6 @@ function displayAnnotation(annotation) {
     commentsDiv.appendChild(clone);
 }
 
-function randomColour() {
-    let colors = ['pink', 'yellow', 'cyan', 'green'];
-    min = 0;
-    max = colors.length;
-    let randomIndex = Math.floor(Math.random() * (max - min)) + min;
-
-    return colors[randomIndex];
-}
-
 function checkTheme() {
     let commentsContainer = document.querySelector('commentscontainer');
     return commentsContainer.classList.contains('dark');
@@ -358,7 +365,6 @@ function checkTheme() {
 
 function changeTheme() {
     let commentsContainer = document.querySelector('commentscontainer');
-    let containerHeader = document.querySelector('#containerHeader');
     let commentTextAreas = [...document.getElementsByClassName('commentTextArea')];
 
     let isInDarkMode = checkTheme();
@@ -366,7 +372,6 @@ function changeTheme() {
     if (isInDarkMode) {
         // remove dark mode classes
         commentsContainer.classList.remove('dark');
-        containerHeader.classList.remove('dark');
         commentTextAreas.forEach(cta => {
             cta.classList.remove('dark');
         });
@@ -374,7 +379,6 @@ function changeTheme() {
     } else {
         // add dark mode classes
         commentsContainer.classList.add('dark');
-        containerHeader.classList.add('dark');
         commentTextAreas.forEach(cta => cta.classList.add('dark'));
     }
 }
