@@ -6,7 +6,7 @@ let containerStateActive = false;
 // Check if the comments panel should be in dark mode by default
 let darkModeByDefault;
 
-chrome.storage.sync.get('darkModeByDefault', function (data) {
+chrome.storage.sync.get('darkModeByDefault', (data) => {
     darkModeByDefault = data.darkModeByDefault;
 });
 
@@ -14,28 +14,28 @@ chrome.storage.sync.get('darkModeByDefault', function (data) {
 chrome.extension.onMessage.addListener(handleMessage);
 function handleMessage(request) {
     switch (request.type) {
-        case 'changeContainerState':
-            ChangeContainerState();
-            break;
-        case 'createAnnotation':
-            CreateDraftAnnotation(request.content);
-            break;
-        case 'changeTheme':
-            changeTheme();
-            break;
+    case 'changeContainerState':
+        ChangeContainerState();
+        break;
+    case 'createAnnotation':
+        CreateDraftAnnotation(request.content);
+        break;
+    case 'changeTheme':
+        changeTheme();
+        break;
     }
 }
 
 // open the comment window and contain content on page load
-chrome.storage.sync.get('activeOnPageLoad', function (data) {
-    let savedStateActive = data.activeOnPageLoad;
+chrome.storage.sync.get('activeOnPageLoad', (data) => {
+    const savedStateActive = data.activeOnPageLoad;
 
     if (savedStateActive) {
         LoadExtension();
     }
-    //If the container isn't active in settings don't wrap content
+    // If the container isn't active in settings don't wrap content
 
-    //Update the current state to the saved state
+    // Update the current state to the saved state
     containerStateActive = savedStateActive;
 });
 
@@ -49,7 +49,7 @@ function ChangeContainerState() {
 
 function LoadExtension() {
     addScriptsToPage();
-    //containPageContent();
+    // containPageContent();
     AuditElements();
     createCommentContainer();
     loadAnnotationsFromCache();
@@ -59,7 +59,7 @@ function LoadExtension() {
 function AuditElements() {
     elementCounter = 1;
     elementsToAudit = document.querySelector('body');
-    elementsToAudit.querySelectorAll('*').forEach(function(element) {
+    elementsToAudit.querySelectorAll('*').forEach((element) => {
         element.setAttribute('element_audit_id', elementCounter);
         elementCounter++;
     });
@@ -67,40 +67,32 @@ function AuditElements() {
 
 // Manage the content container
 function addScriptsToPage() {
-    //Add google font for now
-    document.head.innerHTML = document.head.innerHTML + 
+    // Add google font for now
+    document.head.innerHTML = document.head.innerHTML +
     "<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>";
 }
 
-function containPageContent() {
-    document.body.innerHTML = '<div id="containedBody">' + document.body.innerHTML + '</div>';
-}
-
-//By default a comment box is in edit mode
+// By default a comment box is in edit mode
 function createCommentContainer() {
     document.body.innerHTML = document.body.innerHTML +
     '<commentsContainer>' +
 
+    // Hidden controls for now, will in the future move to popup js
+    // '<div id="containerOptions">' +
+    //     '<button id="share">Share</button>' +
+    //     '<select id="annotationSort">' +
+    //         '<option value="Element">Sort by Element</option>' +
+    //         '<option value="Created">Sort by Created</option>' +
+    //     '</select>' +
+    // '</div>' +
 
-
-    //Hidden controls for now, will in the future move to popup js
-        // '<div id="containerOptions">' +
-        //     '<button id="share">Share</button>' +
-        //     '<select id="annotationSort">' +
-        //         '<option value="Element">Sort by Element</option>' +
-        //         '<option value="Created">Sort by Created</option>' +
-        //     '</select>' +
-        // '</div>' +
-
-
-        
     '</commentsContainer>' +
 
     '<template>' +
         '<div class="commentBox">' +
             '<textarea class="commentTextArea"> ' +
             'If you\'re reading this, then the template was used incorrectly' +
-            '</textarea> '+
+            '</textarea> ' +
             '<div class="controls">' +
                 '<button id="annotate">Annotate</button>' +
                 '<button id="update" class="hidden">Update Annotation</button>' +
@@ -113,8 +105,7 @@ function createCommentContainer() {
     '</template>';
 
     // if the user has set the theme to be dark mode by default, change to dark mode
-    if (darkModeByDefault) 
-    {
+    if (darkModeByDefault) {
         changeTheme();
     }
 
@@ -125,18 +116,18 @@ function createCommentContainer() {
 }
 
 // Work out what element was right clicked
-document.addEventListener("mousedown", function(event){
-    //right click
-    if(event.button == 2) { 
+document.addEventListener('mousedown', (event) => {
+    // right click
+    if (event.button === 2) {
         contextElement = event.target;
 
-        let message = {
+        const message = {
             type: 'setNewContextElement',
-            //contextElement: contextElement, look into this...
+            // contextElement: contextElement, look into this...
             elementType: contextElement.nodeName,
             elementAuditID: contextElement.getAttribute('element_audit_id')
         };
-    
+
         chrome.runtime.sendMessage(message);
     }
 }, true);
