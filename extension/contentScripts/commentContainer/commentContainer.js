@@ -340,7 +340,7 @@ function displayAnnotation(annotation) {
     });
 
     let annotationBox = clone.querySelector('.commentBox');
-    annotationBox.classList.add(randomColour());
+    annotationBox.classList.add('default');
     annotationBox.setAttribute('annotationId', annotation.ID);
 
     // For demo populate annotation with selected text
@@ -356,16 +356,6 @@ function displayAnnotation(annotation) {
     }
 
     commentsDiv.appendChild(clone);
-}
-
-function randomColour() {
-    let colors = ['pink', 'yellow', 'cyan', 'green'];
-    min = 0;
-    max = colors.length;
-    let randomIndex = Math.floor(Math.random() * (max - min)) + min;
-
-    //Making default permanent for now, will remove randomisation and make colours indicative of urgency/purpose/user set in another issue
-    return 'default';
 }
 
 function checkTheme() {
