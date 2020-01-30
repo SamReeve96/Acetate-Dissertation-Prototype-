@@ -210,9 +210,26 @@ function SaveAnnotation(buttonClick) {
 
         setEditMode(annotationId, false);
 
+        //Add hover event trigger to annotated elem
+        attachAnnotatedElementTrigger(annotationId, annotationToSave.elementAuditID, annotationToSave.selectionText);
+
         SortAnnotations();
     }
 }
+
+//selectionText is unused for now
+//Style and attach a hover event
+function attachAnnotatedElementTrigger(annotationId, elementAuditID, selectionText) {
+    let annotatedElem = document.querySelector('[element_audit_id="' + annotationId + '"]');
+    let annotationBox = document.querySelector('[annotationid="' + annotationId + '"]');
+
+    //Style
+
+
+    //Attach trigger
+
+}
+
 
 function DeleteAnnotation(buttonClick) {
     let annotationId =  getIDFromButtonClick(buttonClick);
