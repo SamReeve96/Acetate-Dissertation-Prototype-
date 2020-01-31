@@ -29,11 +29,11 @@ function changeSort() {
         document.querySelector('select#annotationSort').value = annotationSort;
     } else {
         annotationSort = sortOrder;
-        SortAnnotations();
+        sortAnnotations();
     }
 }
 
-function SortAnnotations(redrawAnnotations = true) {
+function sortAnnotations(redrawAnnotations = true) {
     if (annotationSort === 'Element') {
         currentAnnotationInstance.annotations.sort((annotation1, annotation2) => {
             if (annotation1.elementAuditID > annotation2.elementAuditID) {
@@ -69,7 +69,7 @@ function SortAnnotations(redrawAnnotations = true) {
 }
 
 // Create annotation object
-function CreateDraftAnnotation(annotationData) {
+function createDraftAnnotation(annotationData) {
     if (draftAnnotations.length > 0) {
         alert('Please delete or save current draft');
     } else {
@@ -184,7 +184,7 @@ function setEditMode(annotationId, editMode = true) {
     }
 }
 
-function SaveAnnotation(buttonClick) {
+function saveAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
     // Find the draft annotation
@@ -208,7 +208,7 @@ function SaveAnnotation(buttonClick) {
         // Add hover event trigger to annotated elem
         // attachAnnotatedElementTrigger(annotationId, annotationToSave.elementAuditID, annotationToSave.selectionText);
 
-        SortAnnotations();
+        sortAnnotations();
     }
 }
 
@@ -224,7 +224,7 @@ function SaveAnnotation(buttonClick) {
 
 // }
 
-function DeleteAnnotation(buttonClick) {
+function deleteAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
     // Find the annotation
@@ -245,12 +245,12 @@ function DeleteAnnotation(buttonClick) {
     annotationElement.parentNode.removeChild(annotationElement);
 }
 
-function EditAnnotation(buttonClick) {
+function editAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
     setEditMode(annotationId);
 }
 
-function UpdateAnnotation(buttonClick) {
+function updateAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
     // Find the annotation in the cache and update it's attributes
     const annotationIndex = currentAnnotationInstance.annotations.findIndex(annotation => annotation.ID === annotationId);
@@ -269,11 +269,11 @@ function UpdateAnnotation(buttonClick) {
     }
 }
 
-function ToggleThread(buttonClick) {
+function toggleThread(buttonClick) {
     alert('Functionality Coming Soon! Pester me at: https://github.com/SamReeve96/Acetate/ To get me to implement it sooner!');
 }
 
-function CancelAnnotation(buttonClick) {
+function cancelAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
     const annotationIsADraft = draftAnnotations.filter(annotation => annotation.ID === annotationId).length === 1;
@@ -304,32 +304,32 @@ function displayAnnotation(annotation) {
     // Allows the extension to work out what annotation button was pressed
     const saveButton = clone.querySelector('button#annotate');
     saveButton.addEventListener('click', (annotation) => {
-        SaveAnnotation(annotation);
+        saveAnnotation(annotation);
     });
 
     const editButton = clone.querySelector('button#edit');
     editButton.addEventListener('click', (annotation) => {
-        EditAnnotation(annotation);
+        editAnnotation(annotation);
     });
 
     const deleteButton = clone.querySelector('button#delete');
     deleteButton.addEventListener('click', (annotation) => {
-        DeleteAnnotation(annotation);
+        deleteAnnotation(annotation);
     });
 
     const threadButton = clone.querySelector('button#thread');
     threadButton.addEventListener('click', (annotation) => {
-        ToggleThread(annotation);
+        toggleThread(annotation);
     });
 
     const cancelButton = clone.querySelector('button#cancel');
     cancelButton.addEventListener('click', (annotation) => {
-        CancelAnnotation(annotation);
+        cancelAnnotation(annotation);
     });
 
     const updateButton = clone.querySelector('button#update');
     updateButton.addEventListener('click', (annotation) => {
-        UpdateAnnotation(annotation);
+        updateAnnotation(annotation);
     });
 
     const annotationBox = clone.querySelector('.commentBox');

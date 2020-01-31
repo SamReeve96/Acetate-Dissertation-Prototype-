@@ -15,10 +15,10 @@ chrome.extension.onMessage.addListener(handleMessage);
 function handleMessage(request) {
     switch (request.type) {
     case 'changeContainerState':
-        ChangeContainerState();
+        changeContainerState();
         break;
     case 'createAnnotation':
-        CreateDraftAnnotation(request.content);
+        createDraftAnnotation(request.content);
         break;
     case 'changeTheme':
         changeTheme();
@@ -31,7 +31,7 @@ chrome.storage.sync.get('activeOnPageLoad', (data) => {
     const savedStateActive = data.activeOnPageLoad;
 
     if (savedStateActive) {
-        LoadExtension();
+        loadExtension();
     }
     // If the container isn't active in settings don't wrap content
 
@@ -39,24 +39,23 @@ chrome.storage.sync.get('activeOnPageLoad', (data) => {
     containerStateActive = savedStateActive;
 });
 
-function ChangeContainerState() {
+function changeContainerState() {
     if (!containerStateActive) {
-        LoadExtension();
+        loadExtension();
     }
 
     containerStateActive = !containerStateActive;
 }
 
-function LoadExtension() {
+function loadExtension() {
     addScriptsToPage();
-    // containPageContent();
-    AuditElements();
+    auditElements();
     createCommentContainer();
     loadAnnotationsFromCache();
 }
 
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
-function AuditElements() {
+function auditElements() {
     elementCounter = 1;
     elementsToAudit = document.querySelector('body');
     elementsToAudit.querySelectorAll('*').forEach((element) => {
