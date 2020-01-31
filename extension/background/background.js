@@ -43,8 +43,12 @@ function sendChangeContainerState() {
     });
 }
 
+// Context menu ID
+const annotateElementCMenuID = 'Annotate Element';
+
+// Create the Annotate right-click menu option
 chrome.contextMenus.create({
-    id: 'Annotate Element',
+    id: annotateElementCMenuID,
     title: 'Annotate %s',
     contexts: ['page', 'selection', 'image', 'link']
 });
@@ -56,8 +60,9 @@ function setContextElementData(newElementData) {
     contextElementData = newElementData;
 }
 
+// If the user selected the annotate '' right-click menu option, call the corresponding function
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === 'Annotate Element') {
+    if (info.menuItemId === annotateElementCMenuID) {
         // Get element right clicked
         sendCreateAnnotation(info, tab);
     }
