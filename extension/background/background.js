@@ -1,15 +1,3 @@
-chrome.storage.sync.set({ activeOnPageLoad: true }, () => {
-    console.log("by default, the extension is active, because it's in development and it saves time");
-});
-
-// Listen for browser Action to be clicked (change trigger type?)
-chrome.browserAction.onClicked.addListener((tab) => {
-    // For the current tab, inject the file & execute it
-    chrome.tabs.executeScript(tab.ib, {
-        file: './contentContainer/contentContainer.js'
-    });
-});
-
 // Add listener to change extension state (triggered by popup.js)
 chrome.runtime.onMessage.addListener(handleMessage);
 function handleMessage(request) {
@@ -28,6 +16,18 @@ function handleMessage(request) {
         break;
     }
 }
+
+chrome.storage.sync.set({ activeOnPageLoad: true }, () => {
+    console.log("by default, the extension is active, because it's in development and it saves time");
+});
+
+// Listen for browser Action to be clicked (change trigger type?)
+chrome.browserAction.onClicked.addListener((tab) => {
+    // For the current tab, inject the file & execute it
+    chrome.tabs.executeScript(tab.ib, {
+        file: './contentContainer/contentContainer.js'
+    });
+});
 
 function sendChangeContainerState() {
     // Inform content script to change container state
@@ -53,6 +53,7 @@ chrome.contextMenus.create({
     contexts: ['page', 'selection', 'image', 'link']
 });
 
+// Holds the element triggered when right-clicking
 let contextElementData;
 
 // Set the element of the last right clicked element from the buffer in the
@@ -68,6 +69,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 });
 
+// Send a message to the commentContainer script to create an annotation
 function sendCreateAnnotation(info, tab) {
     // Add the current context element
     info.elementType = contextElementData.elementType;
@@ -86,6 +88,7 @@ function sendCreateAnnotation(info, tab) {
         });
     });
 
+    // Reset the context element
     contextElement = undefined;
 }
 
@@ -93,6 +96,7 @@ chrome.storage.sync.set({ darkModeByDefault: true }, () => {
     console.log("by default, the extension is in dark mode, because it's dark mode");
 });
 
+// Store the annotation instance in chrome sync storage
 function cacheInstance(currentInstance) {
     // Get all the instances
     chrome.storage.sync.get(['annotationInstances'], (result) => {
@@ -103,7 +107,7 @@ function cacheInstance(currentInstance) {
             const filteredInstances = result.annotationInstances.filter(instance => (instance.url === currentInstance.url));
 
             if (filteredInstances.length === 1) {
-                // Update instances (remove old instance of url
+                // Remove old instance of url, as a new version will be added
                 annotationInstances = annotationInstances.filter(instance => (instance.url !== currentInstance.url));
             }
         } else {
