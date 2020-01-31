@@ -1,6 +1,6 @@
 // Manage comments
 
-// for now default to 1, but in theory this would be read from a DB
+// For now default to 1, but in theory this would be read from a DB
 let nextAnnotationId = 1;
 
 const currentOriginAndPath = window.location.origin + window.location.pathname;
@@ -59,8 +59,8 @@ function SortAnnotations(redrawAnnotations = true) {
             commentsElem.removeChild(commentsElem.firstChild);
         }
 
-        // redraw annotations
-        // for all annotations, load
+        // Redraw annotations
+        // For all annotations, load
         currentAnnotationInstance.annotations.forEach(annotation => {
             displayAnnotation(annotation);
             setEditMode(annotation.ID, false);
@@ -108,9 +108,9 @@ function cacheInstance() {
     chrome.runtime.sendMessage(message);
 }
 
-// when the extension is loaded on a page, load all the annotations from the cache
+// When the extension is loaded on a page, load all the annotations from the cache
 function loadAnnotationsFromCache() {
-    // set variable instance to cache instance
+    // Set variable instance to cache instance
     chrome.storage.sync.get(['annotationInstances'], (result) => {
         annotationInstances = result.annotationInstances;
 
@@ -120,13 +120,13 @@ function loadAnnotationsFromCache() {
             if (filteredInstances.length === 1) {
                 currentAnnotationInstance = filteredInstances[0];
 
-                // for all annotations, load
+                // For all annotations, load
                 currentAnnotationInstance.annotations.forEach(annotation => {
                     displayAnnotation(annotation);
                     setEditMode(annotation.ID, false);
                 });
 
-                // if annotations have been loaded, update the next id
+                // If annotations have been loaded, update the next id
                 getNextAnnotationID();
             }
         }
@@ -137,7 +137,7 @@ function loadAnnotationsFromCache() {
 function getNextAnnotationID() {
     let largestId = nextAnnotationId;
 
-    // get the highest id from cached annotations
+    // Get the highest id from cached annotations
     currentAnnotationInstance.annotations.forEach(annotation => {
         if (annotation.ID > largestId) {
             largestId = annotation.ID;
@@ -178,7 +178,7 @@ function setEditMode(annotationId, editMode = true) {
         threadButton.classList.add('hidden');
         commentBox.disabled = false;
     } else {
-        // leaving edit mode
+        // Leaving edit mode
         updateButton.classList.add('hidden');
         cancelButton.classList.add('hidden');
     }
@@ -187,7 +187,7 @@ function setEditMode(annotationId, editMode = true) {
 function SaveAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
-    // find the draft annotation
+    // Find the draft annotation
     const filteredAnnotations = draftAnnotations.filter(annotation => annotation.ID === annotationId);
 
     if (filteredAnnotations.length !== 1) {
@@ -200,7 +200,7 @@ function SaveAnnotation(buttonClick) {
         cacheInstance();
         // Then upload to db
 
-        // remove from drafts
+        // Remove from drafts
         draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
 
         setEditMode(annotationId, false);
@@ -212,7 +212,7 @@ function SaveAnnotation(buttonClick) {
     }
 }
 
-// // selectionText is unused for now
+// // SelectionText is unused for now
 // // Style and attach a hover event
 // function attachAnnotatedElementTrigger(annotationId, elementAuditID, selectionText) {
 //     const annotatedElem = document.querySelector('[element_audit_id="' + annotationId + '"]');
@@ -227,13 +227,13 @@ function SaveAnnotation(buttonClick) {
 function DeleteAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
-    // find the annotation
+    // Find the annotation
     const filteredAnnotations = currentAnnotationInstance.annotations.filter(annotation => annotation.ID === annotationId);
 
     if (filteredAnnotations.length !== 1) {
         console.log('Either too many annotations found or not any with the Id: ' + annotationId);
     } else {
-        // remove from cache
+        // Remove from cache
         currentAnnotationInstance.annotations = currentAnnotationInstance.annotations.filter(annotation => annotation.ID !== annotationId);
         cacheInstance();
 
@@ -252,12 +252,12 @@ function EditAnnotation(buttonClick) {
 
 function UpdateAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
-    // find the annotation in the cache and update it's attributes
+    // Find the annotation in the cache and update it's attributes
     const annotationIndex = currentAnnotationInstance.annotations.findIndex(annotation => annotation.ID === annotationId);
 
     if (annotationIndex >= 0) {
         const annotationToUpdate = currentAnnotationInstance.annotations[annotationIndex];
-        // right now editing just the annotation comment
+        // Right now editing just the annotation comment
         const annotationText = document.querySelector('[annotationId="' + annotationId + '"] textarea').value;
         annotationToUpdate.comment = annotationText;
         annotationToUpdate.lastUpdated = Date.now();
@@ -280,9 +280,9 @@ function CancelAnnotation(buttonClick) {
 
     // Determine if an edit cancellation or draft cancellation
     if (annotationIsADraft) {
-        // remove from drafts
+        // Remove from drafts
         draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
-        // remove draft element
+        // Remove draft element
         const annotationElement = document.querySelector('[annotationId="' + annotationId + '"]');
         annotationElement.parentNode.removeChild(annotationElement);
     } else {
@@ -293,7 +293,7 @@ function CancelAnnotation(buttonClick) {
     }
 }
 
-// show annotation
+// Show annotation
 function displayAnnotation(annotation) {
     const commentsDiv = document.querySelector('commentscontainer');
     const commentBoxTemplate = document.querySelector('template');
@@ -341,7 +341,7 @@ function displayAnnotation(annotation) {
 
     annotationTextBox.value = annotation.comment;
 
-    // apply theme styles if needed
+    // Apply theme styles if needed
     const isInDarkMode = checkTheme();
 
     if (isInDarkMode) {
@@ -363,13 +363,13 @@ function changeTheme() {
     const isInDarkMode = checkTheme();
 
     if (isInDarkMode) {
-        // remove dark mode classes
+        // Remove dark mode classes
         commentsContainer.classList.remove('dark');
         commentTextAreas.forEach(cta => {
             cta.classList.remove('dark');
         });
     } else {
-        // add dark mode classes
+        // Add dark mode classes
         commentsContainer.classList.add('dark');
         commentTextAreas.forEach(cta => cta.classList.add('dark'));
     }

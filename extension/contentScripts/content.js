@@ -1,6 +1,6 @@
 // Manage the page
 
-// initialize active state variable
+// Initialize active state variable
 let containerStateActive = false;
 
 // Check if the comments panel should be in dark mode by default
@@ -10,7 +10,7 @@ chrome.storage.sync.get('darkModeByDefault', (data) => {
     darkModeByDefault = data.darkModeByDefault;
 });
 
-// add listener for messages from backend
+// Add listener for messages from backend
 chrome.extension.onMessage.addListener(handleMessage);
 function handleMessage(request) {
     switch (request.type) {
@@ -26,7 +26,7 @@ function handleMessage(request) {
     }
 }
 
-// open the comment window and contain content on page load
+// Open the comment window and contain content on page load
 chrome.storage.sync.get('activeOnPageLoad', (data) => {
     const savedStateActive = data.activeOnPageLoad;
 
@@ -104,7 +104,7 @@ function createCommentContainer() {
         '</div>' +
     '</template>';
 
-    // if the user has set the theme to be dark mode by default, change to dark mode
+    // If the user has set the theme to be dark mode by default, change to dark mode
     if (darkModeByDefault) {
         changeTheme();
     }
@@ -117,7 +117,7 @@ function createCommentContainer() {
 
 // Work out what element was right clicked
 document.addEventListener('mousedown', (event) => {
-    // right click
+    // Right click
     if (event.button === 2) {
         contextElement = event.target;
 

@@ -2,15 +2,15 @@ chrome.storage.sync.set({ activeOnPageLoad: true }, () => {
     console.log("by default, the extension is active, because it's in development and it saves time");
 });
 
-// listen for browser Action to be clicked (change trigger type?)
+// Listen for browser Action to be clicked (change trigger type?)
 chrome.browserAction.onClicked.addListener((tab) => {
-    // for the current tab, inject the file & execute it
+    // For the current tab, inject the file & execute it
     chrome.tabs.executeScript(tab.ib, {
         file: './contentContainer/contentContainer.js'
     });
 });
 
-// add listener to change extension state (triggered by popup.js)
+// Add listener to change extension state (triggered by popup.js)
 chrome.runtime.onMessage.addListener(handleMessage);
 function handleMessage(request) {
     switch (request.type) {
@@ -51,14 +51,14 @@ chrome.contextMenus.create({
 
 let contextElementData;
 
-// set the element of the last right clicked element from the buffer in the
+// Set the element of the last right clicked element from the buffer in the
 function setContextElementData(newElementData) {
     contextElementData = newElementData;
 }
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'Annotate Element') {
-        // get element right clicked
+        // Get element right clicked
         sendCreateAnnotation(info, tab);
     }
 });
@@ -89,16 +89,16 @@ chrome.storage.sync.set({ darkModeByDefault: true }, () => {
 });
 
 function cacheInstance(currentInstance) {
-    // get all the instances
+    // Get all the instances
     chrome.storage.sync.get(['annotationInstances'], (result) => {
         let annotationInstances = result.annotationInstances;
 
-        // if there are any instances
+        // If there are any instances
         if (annotationInstances) {
             const filteredInstances = result.annotationInstances.filter(instance => (instance.url === currentInstance.url));
 
             if (filteredInstances.length === 1) {
-                // update instances (remove old instance of url
+                // Update instances (remove old instance of url
                 annotationInstances = annotationInstances.filter(instance => (instance.url !== currentInstance.url));
             }
         } else {
@@ -106,14 +106,14 @@ function cacheInstance(currentInstance) {
         }
         // Add new url instance
         annotationInstances.push(currentInstance);
-        // save new array of instances
+        // Save new array of instances
         chrome.storage.sync.set({
             annotationInstances: annotationInstances
         });
     });
 }
 
-// added for debugging storage changes
+// Added for debugging storage changes
 // Or throw this at the console - chrome.storage.sync.get(null, function (data) { console.info(data) });
 chrome.storage.onChanged.addListener((changes, namespace) => {
     for (var key in changes) {
