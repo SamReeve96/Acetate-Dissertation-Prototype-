@@ -166,13 +166,14 @@ function getIDFromButtonClick(clickEvent) {
 
 function setEditMode(annotationId, editMode = true) {
     // Update Controls for that annotation
-    const annotateButton = document.querySelector('[annotationId="' + annotationId + '"] #annotate');
-    const updateButton = document.querySelector('[annotationId="' + annotationId + '"] #update');
-    const deleteButton = document.querySelector('[annotationId="' + annotationId + '"] #delete');
-    const editButton = document.querySelector('[annotationId="' + annotationId + '"] #edit');
-    const threadButton = document.querySelector('[annotationId="' + annotationId + '"] #thread');
-    const cancelButton = document.querySelector('[annotationId="' + annotationId + '"] #cancel');
-    const commentBox = document.querySelector('[annotationId="' + annotationId + '"] textarea');
+    const selectorPrefix = '[annotationId="' + annotationId + '"]';
+    const annotateButton = document.querySelector(selectorPrefix + ' #annotate');
+    const updateButton = document.querySelector(selectorPrefix + ' #update');
+    const deleteButton = document.querySelector(selectorPrefix + ' #delete');
+    const editButton = document.querySelector(selectorPrefix + ' #edit');
+    const threadButton = document.querySelector(selectorPrefix + ' #thread');
+    const cancelButton = document.querySelector(selectorPrefix + ' #cancel');
+    const commentBox = document.querySelector(selectorPrefix + ' textarea');
 
     // Only visible in draft state
     annotateButton.classList.add('hidden');
