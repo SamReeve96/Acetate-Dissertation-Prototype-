@@ -16,25 +16,37 @@ let currentAnnotationInstance = {
 // TODO if the user leaves the page when this array is populated, alert are they sure they want to leave-
 let draftAnnotations = [];
 
-let annotationSort = 'Element';
+// Ways the annotation cards can be ordered
+const annotationSortMode = {
+    ELEMENT: 'Element',
+    CREATED: 'Created'
+};
+
+// Assign a default sort order
+let annotationSort = annotationSortMode.ELEMENT;
 
 function changeSort() {
-    const sortOrder = document.querySelector('select#annotationSort').value;
+    // document.querySelector('select#annotationSort').value;
+    // Made change sort default to always change to Element as theres no UI option alter it currently
+    // Not using the object here as this simulates the string being read from the dropdown option
+    const sortOrder = 'Element';
 
     if (draftAnnotations.length > 0) {
         alert('Please delete or save current draft');
-        document.querySelector('select#annotationSort').value = annotationSort;
+        // Reset dropdown
+        // document.querySelector('select#annotationSort').value = annotationSort;
     } else if (currentAnnotationInstance.annotations.length < 1) {
         alert('Nothing to sort... Annotate some things first!');
-        document.querySelector('select#annotationSort').value = annotationSort;
+        // Reset dropdown
+        // document.querySelector('select#annotationSort').value = annotationSort;
     } else {
-        annotationSort = sortOrder;
+        annotationSort = (sortOrder === annotationSortMode.ELEMENT) ? annotationSortMode.ELEMENT : annotationSortMode.CREATED;
         sortAnnotations();
     }
 }
 
 function sortAnnotations(redrawAnnotations = true) {
-    if (annotationSort === 'Element') {
+    if (annotationSort === annotationSortMode.ELEMENT) {
         currentAnnotationInstance.annotations.sort((annotation1, annotation2) => {
             if (annotation1.elementAuditID > annotation2.elementAuditID) {
                 return 1;
@@ -46,7 +58,7 @@ function sortAnnotations(redrawAnnotations = true) {
                 return annotation1.created - annotation2.created;
             }
         });
-    } else if (annotationSort === 'Created') {
+    } else if (annotationSort === annotationSortMode.CREATED) {
         currentAnnotationInstance.annotations.sort((annotation1, annotation2) => {
             return annotation1.created - annotation2.created;
         });
