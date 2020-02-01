@@ -1,8 +1,8 @@
 {
-  "name": "acetate",
-  "version": "1.0.0",
+  "name": "Acetate",
+  "version": "0.1.0",
   "description": "Annotate the web",
-  "main": "index.js",
+  "main": "extension/contentScripts/content.js",
   "dependencies": {},
   "devDependencies": {
     "eslint": "^6.8.0",
@@ -13,13 +13,12 @@
     "eslint-plugin-standard": "^4.0.1"
   },
   "scripts": {
-    "test": "RunTest"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SamReeve96/Acetate.git"
   },
-  "author": "",
+  "author": "SJR",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/SamReeve96/Acetate/issues"
