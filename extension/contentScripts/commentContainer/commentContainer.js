@@ -87,7 +87,7 @@ function createDraftAnnotation(annotationData) {
     } else {
         const newAnnotation = {
             ID: nextAnnotationId++,
-            elementAuditID: annotationData.elementAuditID,
+            elementAuditID: parseInt(annotationData.elementAuditID),
             elementType: annotationData.elementType,
             selectedText: annotationData.selectionText,
             created: Date.now()
