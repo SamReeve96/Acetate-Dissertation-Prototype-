@@ -201,28 +201,28 @@ function saveAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
     // Find the draft annotation
-    const filteredAnnotations = draftAnnotations.filter(annotation => annotation.ID === annotationId);
+    const draftAnnotation = draftAnnotations.find(annotation => annotation.ID === annotationId);
 
-    if (filteredAnnotations.length !== 1) {
-        console.log('Either too many annotations found or not any with the Id: ' + annotationId);
-    } else {
-        // The annotation currently in drafts that will be moved to the instance array
-        const annotationToSave = filteredAnnotations[0];
-        annotationToSave.comment = document.querySelector('[annotationId="' + annotationId + '"] textarea').value;
-        currentAnnotationInstance.annotations.push(annotationToSave);
-        cacheInstance();
-        // Then upload to db
-
-        // Remove from drafts
-        draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
-
-        setEditMode(annotationId, false);
-
-        // Add hover event trigger to annotated elem
-        // attachAnnotatedElementTrigger(annotationId, annotationToSave.elementAuditID, annotationToSave.selectionText);
-
-        sortAnnotations();
+    if (draftAnnotation === undefined) {
+        console.log('Failed to find draft annotation with the Id: ' + annotationId);
+        return;
     }
+
+    // The annotation currently in drafts that will be moved to the instance array
+    draftAnnotation.comment = document.querySelector('[annotationId="' + annotationId + '"] textarea').value;
+    currentAnnotationInstance.annotations.push(draftAnnotation);
+    cacheInstance();
+    // Then upload to db
+
+    // Remove from drafts
+    draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
+
+    setEditMode(annotationId, false);
+
+    // Add hover event trigger to annotated elem
+    // attachAnnotatedElementTrigger(annotationId, draftAnnotation.elementAuditID, draftAnnotation.selectionText);
+
+    sortAnnotations();
 }
 
 // // SelectionText is unused for now
@@ -240,18 +240,19 @@ function saveAnnotation(buttonClick) {
 function deleteAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
-    // Find the annotation
-    const filteredAnnotations = currentAnnotationInstance.annotations.filter(annotation => annotation.ID === annotationId);
+    // Find the draft annotation
+    const annotationToDelete = currentAnnotationInstance.annotations.find(annotation => annotation.ID === annotationId);
 
-    if (filteredAnnotations.length !== 1) {
-        console.log('Either too many annotations found or not any with the Id: ' + annotationId);
-    } else {
-        // Remove from cache
-        currentAnnotationInstance.annotations = currentAnnotationInstance.annotations.filter(annotation => annotation.ID !== annotationId);
-        cacheInstance();
-
-        // Then remove from DB
+    if (annotationToDelete === undefined) {
+        console.log('Failed to find annotation with the Id: ' + annotationId);
+        return;
     }
+
+    // Remove from cache
+    currentAnnotationInstance.annotations = currentAnnotationInstance.annotations.filter(annotation => annotation.ID !== annotationId);
+    cacheInstance();
+
+    // Then remove from DB
 
     // Remove html element
     const annotationElement = document.querySelector('[annotationId="' + annotationId + '"]');
