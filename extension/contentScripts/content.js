@@ -6,7 +6,7 @@ let containerStateActive = false;
 // Check if the comments panel should be in dark mode by default
 let darkModeByDefault;
 
-chrome.storage.sync.get('darkModeByDefault', (data) => {
+chrome.storage.sync.get('darkModeByDefault', data => {
     darkModeByDefault = data.darkModeByDefault;
 });
 
@@ -27,7 +27,7 @@ function handleMessage(request) {
 }
 
 // Open the comment window and contain content on page load
-chrome.storage.sync.get('activeOnPageLoad', (data) => {
+chrome.storage.sync.get('activeOnPageLoad', data => {
     const savedStateActive = data.activeOnPageLoad;
 
     if (savedStateActive) {
@@ -58,7 +58,7 @@ function loadExtension() {
 function auditElements() {
     elementCounter = 1;
     elementsToAudit = document.querySelector('body');
-    elementsToAudit.querySelectorAll('*').forEach((element) => {
+    elementsToAudit.querySelectorAll('*').forEach(element => {
         element.setAttribute('element_audit_id', elementCounter);
         elementCounter++;
     });
@@ -115,7 +115,7 @@ function createCommentContainer() {
 }
 
 // Work out what element was right clicked
-document.addEventListener('mousedown', (event) => {
+document.addEventListener('mousedown', event => {
     // Right click
     if (event.button === 2) {
         contextElement = event.target;

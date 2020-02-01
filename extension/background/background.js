@@ -22,7 +22,7 @@ chrome.storage.sync.set({ activeOnPageLoad: true }, () => {
 });
 
 // Listen for browser Action to be clicked (change trigger type?)
-chrome.browserAction.onClicked.addListener((tab) => {
+chrome.browserAction.onClicked.addListener(tab => {
     // For the current tab, inject the file & execute it
     chrome.tabs.executeScript(tab.ib, {
         file: './contentContainer/contentContainer.js'
@@ -36,7 +36,7 @@ function sendChangeContainerState() {
     };
 
     // Send message
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, message, () => {
             console.log('message sent');
         });
@@ -82,7 +82,7 @@ function sendCreateAnnotation(info, tab) {
     };
 
     // Send message
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         chrome.tabs.sendMessage(tab.id, message, () => {
             console.log('message sent');
         });
@@ -99,7 +99,7 @@ chrome.storage.sync.set({ darkModeByDefault: true }, () => {
 // Store the annotation instance in chrome sync storage
 function cacheInstance(currentInstance) {
     // Get all the instances
-    chrome.storage.sync.get(['annotationInstances'], (storage) => {
+    chrome.storage.sync.get(['annotationInstances'], storage => {
         let annotationInstances = storage.annotationInstances;
 
         if (annotationInstances) {

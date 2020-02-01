@@ -2,7 +2,7 @@
 
 const activeOnPageLoadCheckBox = document.getElementById('activeOnPageLoad');
 
-chrome.storage.sync.get('activeOnPageLoad', (data) => {
+chrome.storage.sync.get('activeOnPageLoad', data => {
     activeOnPageLoadCheckBox.checked = data.activeOnPageLoad;
 });
 
@@ -16,7 +16,7 @@ activeOnPageLoadCheckBox.addEventListener('change', () => {
 
 const darkModeByDefaultCheckBox = document.getElementById('darkModeByDefault');
 
-chrome.storage.sync.get('darkModeByDefault', (data) => {
+chrome.storage.sync.get('darkModeByDefault', data => {
     darkModeByDefaultCheckBox.checked = data.darkModeByDefault;
 });
 

@@ -123,7 +123,7 @@ function cacheInstance() {
 // When the extension is loaded on a page, load all the annotations from the cache
 function loadAnnotationsFromCache() {
     // Set variable instance to cache instance
-    chrome.storage.sync.get(['annotationInstances'], (result) => {
+    chrome.storage.sync.get(['annotationInstances'], result => {
         annotationInstances = result.annotationInstances;
 
         if (annotationInstances !== undefined) {
@@ -317,32 +317,32 @@ function displayAnnotation(annotation) {
 
     // Allows the extension to work out what annotation button was pressed
     const saveButton = cloneCommentBox.querySelector('button#annotate');
-    saveButton.addEventListener('click', (annotation) => {
+    saveButton.addEventListener('click', annotation => {
         saveAnnotation(annotation);
     });
 
     const editButton = cloneCommentBox.querySelector('button#edit');
-    editButton.addEventListener('click', (annotation) => {
+    editButton.addEventListener('click', annotation => {
         editAnnotation(annotation);
     });
 
     const deleteButton = cloneCommentBox.querySelector('button#delete');
-    deleteButton.addEventListener('click', (annotation) => {
+    deleteButton.addEventListener('click', annotation => {
         deleteAnnotation(annotation);
     });
 
     const threadButton = cloneCommentBox.querySelector('button#thread');
-    threadButton.addEventListener('click', (annotation) => {
+    threadButton.addEventListener('click', annotation => {
         toggleThread(annotation);
     });
 
     const cancelButton = cloneCommentBox.querySelector('button#cancel');
-    cancelButton.addEventListener('click', (annotation) => {
+    cancelButton.addEventListener('click', annotation => {
         cancelAnnotation(annotation);
     });
 
     const updateButton = cloneCommentBox.querySelector('button#update');
-    updateButton.addEventListener('click', (annotation) => {
+    updateButton.addEventListener('click', annotation => {
         updateAnnotation(annotation);
     });
 
