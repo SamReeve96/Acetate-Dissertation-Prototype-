@@ -1,5 +1,0 @@
-#containedBody {
-    flex: 67vw;
-    /*shouldn't need to be done with the proper 2X shadow dom implementation*/
-    margin-right: 10px; 
-}
