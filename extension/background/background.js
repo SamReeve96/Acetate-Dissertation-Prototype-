@@ -129,8 +129,8 @@ function cacheInstance(currentInstance) {
 chrome.storage.onChanged.addListener((changes, namespace) => {
     for (var key in changes) {
         var storageChange = changes[key];
-        console.log('Storage key "%s" in namespace "%s" changed. ' +
-                  'Old value was "%s", new value is "%s".',
+        console.log(`Storage key "${key}" in namespace "${namespace}" changed. ` +
+                  `Old value was "${storageChange.oldValue}", new value is "${storageChange.newValue}".`,
         key,
         namespace,
         storageChange.oldValue,
