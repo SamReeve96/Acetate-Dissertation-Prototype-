@@ -289,7 +289,7 @@ function toggleThread(buttonClick) {
 function cancelAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
-    const annotationIsADraft = draftAnnotations.filter(annotation => annotation.ID === annotationId).length === 1;
+    const annotationIsADraft = draftAnnotations.find(annotation => annotation.ID === annotationId) !== undefined;
 
     // Determine if an edit cancellation or draft cancellation
     if (annotationIsADraft) {

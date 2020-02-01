@@ -99,18 +99,20 @@ chrome.storage.sync.set({ darkModeByDefault: true }, () => {
 // Store the annotation instance in chrome sync storage
 function cacheInstance(currentInstance) {
     // Get all the instances
-    chrome.storage.sync.get(['annotationInstances'], (result) => {
-        let annotationInstances = result.annotationInstances;
+    chrome.storage.sync.get(['annotationInstances'], (storage) => {
+        let annotationInstances = storage.annotationInstances;
 
-        // If there are any instances
         if (annotationInstances) {
-            const filteredInstances = result.annotationInstances.filter(instance => (instance.url === currentInstance.url));
+            // See if there is a saved instance for the current URL
+            const savedInstance = storage.annotationInstances.find(instance => (instance.url === currentInstance.url));
 
-            if (filteredInstances.length === 1) {
-                // Remove old instance of url, as a new version will be added
+            if (savedInstance !== undefined) {
+                // Chrome sync storage has an instance
+                // Remove old instance, as a new version will be added to the list of instances
                 annotationInstances = annotationInstances.filter(instance => (instance.url !== currentInstance.url));
             }
         } else {
+            // Storage has no instances, create a new empty array of instances
             annotationInstances = [];
         }
         // Add new url instance
