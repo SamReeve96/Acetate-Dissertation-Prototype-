@@ -313,45 +313,45 @@ function displayAnnotation(annotation) {
     const commentBoxTemplate = document.querySelector('template');
 
     // Create new comment instance
-    const clone = document.importNode(commentBoxTemplate.content, true);
+    const cloneCommentBox = document.importNode(commentBoxTemplate.content, true);
 
     // Allows the extension to work out what annotation button was pressed
-    const saveButton = clone.querySelector('button#annotate');
+    const saveButton = cloneCommentBox.querySelector('button#annotate');
     saveButton.addEventListener('click', (annotation) => {
         saveAnnotation(annotation);
     });
 
-    const editButton = clone.querySelector('button#edit');
+    const editButton = cloneCommentBox.querySelector('button#edit');
     editButton.addEventListener('click', (annotation) => {
         editAnnotation(annotation);
     });
 
-    const deleteButton = clone.querySelector('button#delete');
+    const deleteButton = cloneCommentBox.querySelector('button#delete');
     deleteButton.addEventListener('click', (annotation) => {
         deleteAnnotation(annotation);
     });
 
-    const threadButton = clone.querySelector('button#thread');
+    const threadButton = cloneCommentBox.querySelector('button#thread');
     threadButton.addEventListener('click', (annotation) => {
         toggleThread(annotation);
     });
 
-    const cancelButton = clone.querySelector('button#cancel');
+    const cancelButton = cloneCommentBox.querySelector('button#cancel');
     cancelButton.addEventListener('click', (annotation) => {
         cancelAnnotation(annotation);
     });
 
-    const updateButton = clone.querySelector('button#update');
+    const updateButton = cloneCommentBox.querySelector('button#update');
     updateButton.addEventListener('click', (annotation) => {
         updateAnnotation(annotation);
     });
 
-    const annotationBox = clone.querySelector('.commentBox');
+    const annotationBox = cloneCommentBox.querySelector('.commentBox');
     annotationBox.classList.add('default');
     annotationBox.setAttribute('annotationId', annotation.ID);
 
     // For demo populate annotation with selected text
-    const annotationTextBox = clone.querySelector('textarea');
+    const annotationTextBox = cloneCommentBox.querySelector('textarea');
 
     annotationTextBox.value = annotation.comment;
 
@@ -362,7 +362,7 @@ function displayAnnotation(annotation) {
         annotationTextBox.classList.add('dark');
     }
 
-    commentsDiv.appendChild(clone);
+    commentsDiv.appendChild(cloneCommentBox);
 }
 
 function checkTheme() {
