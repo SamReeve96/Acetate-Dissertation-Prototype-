@@ -132,6 +132,9 @@ function loadAnnotationsFromCache() {
             if (filteredInstances.length === 1) {
                 currentAnnotationInstance = filteredInstances[0];
 
+                // Sort Annotations before displaying them
+                sortAnnotations(false);
+
                 // For all annotations, load
                 currentAnnotationInstance.annotations.forEach(annotation => {
                     displayAnnotation(annotation);
@@ -167,29 +170,32 @@ function getIDFromButtonClick(clickEvent) {
 function setEditMode(annotationId, editMode = true) {
     // Update Controls for that annotation
     const selectorPrefix = '[annotationId="' + annotationId + '"]';
+    const annotationCard = document.querySelector(selectorPrefix);
     const annotateButton = document.querySelector(selectorPrefix + ' #annotate');
     const updateButton = document.querySelector(selectorPrefix + ' #update');
     const deleteButton = document.querySelector(selectorPrefix + ' #delete');
     const editButton = document.querySelector(selectorPrefix + ' #edit');
     const threadButton = document.querySelector(selectorPrefix + ' #thread');
     const cancelButton = document.querySelector(selectorPrefix + ' #cancel');
-    const commentBox = document.querySelector(selectorPrefix + ' textarea');
+    const textArea = document.querySelector(selectorPrefix + ' textarea');
 
     // Only visible in draft state
+    annotationCard.classList.remove('edit');
     annotateButton.classList.add('hidden');
     updateButton.classList.remove('hidden');
     deleteButton.classList.remove('hidden');
     editButton.classList.remove('hidden');
     threadButton.classList.remove('hidden');
     cancelButton.classList.remove('hidden');
-    commentBox.disabled = true;
+    textArea.disabled = true;
 
     if (editMode) {
         // Entering edit mode
         deleteButton.classList.add('hidden');
         editButton.classList.add('hidden');
         threadButton.classList.add('hidden');
-        commentBox.disabled = false;
+        textArea.disabled = false;
+        annotationCard.classList.add('edit');
     } else {
         // Leaving edit mode
         updateButton.classList.add('hidden');
@@ -217,30 +223,13 @@ function saveAnnotation(buttonClick) {
     // Remove from drafts
     draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
 
-    setEditMode(annotationId, false);
-
-    // Add hover event trigger to annotated elem
-    // attachAnnotatedElementTrigger(annotationId, draftAnnotation.elementAuditID, draftAnnotation.selectionText);
-
     sortAnnotations();
 }
-
-// // SelectionText is unused for now
-// // Style and attach a hover event
-// function attachAnnotatedElementTrigger(annotationId, elementAuditID, selectionText) {
-//     const annotatedElem = document.querySelector('[element_audit_id="' + annotationId + '"]');
-//     const annotationBox = document.querySelector('[annotationid="' + annotationId + '"]');
-
-//     // Style
-
-//     // Attach trigger
-
-// }
 
 function deleteAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
-    // Find the draft annotation
+    // Find the annotation
     const annotationToDelete = currentAnnotationInstance.annotations.find(annotation => annotation.ID === annotationId);
 
     if (annotationToDelete === undefined) {
@@ -257,6 +246,9 @@ function deleteAnnotation(buttonClick) {
     // Remove html element
     const annotationElement = document.querySelector('[annotationId="' + annotationId + '"]');
     annotationElement.parentNode.removeChild(annotationElement);
+
+    // Remove content modifications (eventListener & Css class)
+    // const annotatedElement = document.querySelector('[annotationId="' + annotationId + '"]');
 }
 
 function editAnnotation(buttonClick) {
@@ -363,6 +355,9 @@ function displayAnnotation(annotation) {
     }
 
     commentsDiv.appendChild(cloneCommentBox);
+
+    // Add hover event trigger to annotated elem in content.js
+    attachAnnotatedElementTrigger(annotation.ID, annotation.elementAuditID, annotation.selectionText);
 }
 
 function checkTheme() {

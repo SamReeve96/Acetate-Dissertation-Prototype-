@@ -71,7 +71,6 @@ function addScriptsToPage() {
     "<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>";
 }
 
-// By default a comment box is in edit mode
 function createCommentContainer() {
     document.body.innerHTML = document.body.innerHTML +
     '<commentsContainer>' +
@@ -87,8 +86,9 @@ function createCommentContainer() {
 
     '</commentsContainer>' +
 
+    // By default a comment box is in edit mode
     '<template>' +
-        '<div class="commentBox">' +
+        '<div class="commentBox edit">' +
             '<textarea class="commentTextArea"> ' +
             'If you\'re reading this, then the template was used incorrectly' +
             '</textarea> ' +
@@ -130,5 +130,101 @@ document.addEventListener('mousedown', event => {
         chrome.runtime.sendMessage(message);
     }
 }, true);
+
+document.addEventListener('keydown', keyPress);
+
+function keyPress(event) {
+    // && pressedKeys.o) {
+    if (event.key === 'o') {
+        toggleCards();
+    }
+}
+let allCardsOutToggle = false;
+function toggleCards() {
+    if (allCardsOutToggle) {
+        SlideBackCards();
+        allCardsOutToggle = false;
+    } else {
+        SlideOutCards();
+        allCardsOutToggle = true;
+    }
+}
+
+// An array of id's to slide out
+function SlideOutCards(annotationsToSlide = []) {
+    if (annotationsToSlide.length === 0) {
+        // Slide all annotations
+        annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
+            return annotation.ID;
+        });
+    }
+
+    annotationsToSlide.forEach(annotationId => {
+        const annotationToSlide = document.querySelector('[annotationid="' + annotationId + '"]');
+        annotationToSlide.classList.add('slideOut');
+    });
+}
+
+function SlideBackCards(annotationsToSlide = []) {
+    if (annotationsToSlide.length === 0) {
+        // Slide all annotations
+        annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
+            return annotation.ID;
+        });
+    }
+
+    annotationsToSlide.forEach(annotationId => {
+        const annotationToSlide = document.querySelector('[annotationid="' + annotationId + '"]');
+        annotationToSlide.classList.remove('slideOut');
+    });
+}
+
+// Map of element to array of element IDs
+const elementAnnotations = {};
+
+function onElementMouseOver(annotatedElem) {
+    if (allCardsOutToggle) {
+        return;
+    }
+
+    const annotatedElemID = annotatedElem.getAttribute('element_audit_id');
+    const annotationCardsToSlide = elementAnnotations[annotatedElemID];
+    SlideOutCards(annotationCardsToSlide);
+}
+
+function onElementMouseLeave(annotatedElem) {
+    if (allCardsOutToggle) {
+        return;
+    }
+
+    const annotatedElemID = annotatedElem.getAttribute('element_audit_id');
+    const annotationCardsToSlide = elementAnnotations[annotatedElemID];
+    SlideBackCards(annotationCardsToSlide);
+}
+
+// selectionText is unused for now
+// Style and attach a hover event
+function attachAnnotatedElementTrigger(annotationId, elementAuditID, selectionText) {
+    const annotatedElem = document.querySelector('[element_audit_id="' + elementAuditID + '"]');
+
+    // Style and hover trigger
+    annotatedElem.classList.add('annotated');
+
+    const annotatedElemID = annotatedElem.getAttribute('element_audit_id');
+
+    if (!elementAnnotations[annotatedElemID]) {
+        elementAnnotations[annotatedElemID] = [annotationId];
+
+        annotatedElem.addEventListener('mouseover', () => {
+            onElementMouseOver(annotatedElem);
+        });
+
+        annotatedElem.addEventListener('mouseleave', () => {
+            onElementMouseLeave(annotatedElem);
+        });
+    } else {
+        elementAnnotations[annotatedElemID].push(annotationId);
+    }
+}
 
 console.log('ready for lift off');
