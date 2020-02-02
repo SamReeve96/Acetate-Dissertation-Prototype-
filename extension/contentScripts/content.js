@@ -159,9 +159,17 @@ function SlideOutCards(annotationsToSlide = []) {
         });
     }
 
+    // Delay for animation in ms
+    let delay = 0;
+    const animationTotalTime = 62;
+    const delayIncrementSize = animationTotalTime / annotationsToSlide.length;
+
     annotationsToSlide.forEach(annotationId => {
         const annotationToSlide = document.querySelector('[annotationid="' + annotationId + '"]');
-        annotationToSlide.classList.add('slideOut');
+        setTimeout(() => {
+            annotationToSlide.classList.add('slideOut');
+        }, delay);
+        delay += delayIncrementSize;
     });
 }
 
@@ -173,10 +181,21 @@ function SlideBackCards(annotationsToSlide = []) {
         });
     }
 
+    // Delay for animation in ms
+    let delay = 0;
+    const animationTotalTime = 62;
+    const delayIncrementSize = animationTotalTime / annotationsToSlide.length;
+
     annotationsToSlide.forEach(annotationId => {
         const annotationToSlide = document.querySelector('[annotationid="' + annotationId + '"]');
-        annotationToSlide.classList.remove('slideOut');
+        setTimeout(() => {
+            annotationToSlide.classList.remove('slideOut');
+        }, delay);
+        delay += delayIncrementSize;
+        ;
     });
+
+    delay = 0;
 }
 
 // Map of element to array of element IDs
