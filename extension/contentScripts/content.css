@@ -1,3 +1,10 @@
 .annotated {
-    background-color: rgba(204, 255, 21, 0.4);
+    outline: none;
+    background-color: rgba(243, 147, 110, 0.5);
+    box-shadow: rgba(243, 147, 110, 1) 0px 0px 5px 0px;
+}
+
+img.annotated {
+    outline: none;
+    box-shadow: rgba(243, 147, 110, 1) 0px 0px 15px 5px;
 }
