@@ -56,8 +56,8 @@ function loadExtension() {
 
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
 function auditElements() {
-    elementCounter = 1;
-    elementsToAudit = document.querySelector('body');
+    let elementCounter = 1;
+    const elementsToAudit = document.querySelector('body');
     elementsToAudit.querySelectorAll('*').forEach(element => {
         element.setAttribute('element_audit_id', elementCounter);
         elementCounter++;
