@@ -199,7 +199,13 @@ function SlideBackCards(annotationsToSlide = []) {
 }
 
 // Map of element to array of element IDs
-const elementAnnotations = {};
+// Eslint is disabled for this line, var is assigned in another file
+// eslint-disable-next-line prefer-const
+let elementAnnotationsMap = {};
+
+function resetElementAnnotationEventMap() {
+    elementAnnotationsMap = {};
+}
 
 function onElementMouseOver(annotatedElem) {
     if (allCardsOutToggle) {
@@ -207,7 +213,7 @@ function onElementMouseOver(annotatedElem) {
     }
 
     const annotatedElemID = annotatedElem.getAttribute('element_audit_id');
-    const annotationCardsToSlide = elementAnnotations[annotatedElemID];
+    const annotationCardsToSlide = elementAnnotationsMap[annotatedElemID];
     SlideOutCards(annotationCardsToSlide);
 }
 
@@ -217,7 +223,7 @@ function onElementMouseLeave(annotatedElem) {
     }
 
     const annotatedElemID = annotatedElem.getAttribute('element_audit_id');
-    const annotationCardsToSlide = elementAnnotations[annotatedElemID];
+    const annotationCardsToSlide = elementAnnotationsMap[annotatedElemID];
     SlideBackCards(annotationCardsToSlide);
 }
 
@@ -231,8 +237,8 @@ function attachAnnotatedElementTrigger(annotationId, elementAuditID, selectionTe
 
     const annotatedElemID = annotatedElem.getAttribute('element_audit_id');
 
-    if (!elementAnnotations[annotatedElemID]) {
-        elementAnnotations[annotatedElemID] = [annotationId];
+    if (!elementAnnotationsMap[annotatedElemID]) {
+        elementAnnotationsMap[annotatedElemID] = [annotationId];
 
         annotatedElem.addEventListener('mouseover', () => {
             onElementMouseOver(annotatedElem);
@@ -242,7 +248,7 @@ function attachAnnotatedElementTrigger(annotationId, elementAuditID, selectionTe
             onElementMouseLeave(annotatedElem);
         });
     } else {
-        elementAnnotations[annotatedElemID].push(annotationId);
+        elementAnnotationsMap[annotatedElemID].push(annotationId);
     }
 }
 

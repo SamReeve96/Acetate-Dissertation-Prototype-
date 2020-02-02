@@ -65,6 +65,9 @@ function sortAnnotations(redrawAnnotations = true) {
     }
 
     if (redrawAnnotations) {
+        // Clear Element Annotation event map
+        clearElementAnnotationEventMap();
+
         // Remove all annotation template elements
         const commentsElem = document.querySelector('commentscontainer');
         while (commentsElem.firstChild) {
@@ -223,6 +226,7 @@ function saveAnnotation(buttonClick) {
     // Remove from drafts
     draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
 
+    // Resort annotations to move ex-draft to correct position
     sortAnnotations();
 }
 
@@ -242,13 +246,21 @@ function deleteAnnotation(buttonClick) {
     cacheInstance();
 
     // Then remove from DB
+    // Implementing at beta
 
     // Remove html element
     const annotationElement = document.querySelector('[annotationId="' + annotationId + '"]');
     annotationElement.parentNode.removeChild(annotationElement);
 
-    // Remove content modifications (eventListener & Css class)
-    // const annotatedElement = document.querySelector('[annotationId="' + annotationId + '"]');
+    // Remove content modifications eventlistener
+    const elemAnnotationIdPos = elementAnnotationsMap[annotationToDelete.elementAuditID].indexOf(annotationId);
+    elementAnnotationsMap[annotationToDelete.elementAuditID].splice(elemAnnotationIdPos, 1);
+
+    // And, if the last annotation for that element is deleted, remove the highlight
+    if (elementAnnotationsMap[annotationToDelete.elementAuditID].length === 0) {
+        const annotatedElem = document.querySelector('[element_audit_id="' + annotationToDelete.elementAuditID + '"]');
+        annotatedElem.classList.remove('annotated');
+    }
 }
 
 function editAnnotation(buttonClick) {
@@ -286,11 +298,25 @@ function cancelAnnotation(buttonClick) {
 
     // Determine if an edit cancellation or draft cancellation
     if (annotationIsADraft) {
+        // Get the draft element ID
+        const draftAnnotationElemId = draftAnnotations.find(annotation => annotation.ID === annotationId).elementAuditID;
+
         // Remove from drafts
         draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
         // Remove draft element
         const annotationElement = document.querySelector('[annotationId="' + annotationId + '"]');
+
         annotationElement.parentNode.removeChild(annotationElement);
+
+        // Remove element id from slide event map object
+        const elemAnnotationIdPos = elementAnnotationsMap[draftAnnotationElemId].indexOf(annotationId);
+        elementAnnotationsMap[annotationToDelete.elementAuditID].splice(elemAnnotationIdPos, 1);
+
+        // And, if the last annotation for that element is deleted, remove the highlight
+        if (elementAnnotationsMap[annotationToDelete.elementAuditID].length === 0) {
+            const annotatedElem = document.querySelector('[element_audit_id="' + annotationToDelete.elementAuditID + '"]');
+            annotatedElem.classList.remove('annotated');
+        }
     } else {
         // Reset commentBox value
         const annotationIndex = currentAnnotationInstance.annotations.findIndex(annotation => annotation.ID === annotationId);
