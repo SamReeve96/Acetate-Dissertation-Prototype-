@@ -203,7 +203,7 @@ function SlideBackCards(annotationsToSlide = []) {
 // eslint-disable-next-line prefer-const
 let elementAnnotationsMap = {};
 
-function resetElementAnnotationEventMap() {
+function clearElementAnnotationEventMap() {
     elementAnnotationsMap = {};
 }
 
