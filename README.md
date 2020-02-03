@@ -27,6 +27,10 @@ Key goals:
 - Resolve known bugs
 - Take feedback from prototype phase to further influence design of extension
 
+![Image of Alpha UI update](https://github.com/SamReeve96/Acetate/blob/master/Misc%20Resources/Images/AcetateUIAlphaUpdate.gif?raw=true)
+
+Demo showing new UI and card popout triggers (hover over the card, the cards corresponding element or pressing the shortcut to open them all (currently assigned to "o")
+
 ### Beta
 The Beta will build on the Alpha by implementing the backend server and Database for storage. As this is a largely technical release, it will not be released on the chrome store.
 
