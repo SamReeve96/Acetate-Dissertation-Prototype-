@@ -56,8 +56,8 @@ function loadExtension() {
 
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
 function auditElements() {
-    elementCounter = 1;
-    elementsToAudit = document.querySelector('body');
+    let elementCounter = 1;
+    const elementsToAudit = document.querySelector('body');
     elementsToAudit.querySelectorAll('*').forEach(element => {
         element.setAttribute('element_audit_id', elementCounter);
         elementCounter++;
@@ -71,7 +71,6 @@ function addScriptsToPage() {
     "<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>";
 }
 
-// By default a comment box is in edit mode
 function createCommentContainer() {
     document.body.innerHTML = document.body.innerHTML +
     '<commentsContainer>' +
@@ -87,8 +86,9 @@ function createCommentContainer() {
 
     '</commentsContainer>' +
 
+    // By default a comment box is in edit mode
     '<template>' +
-        '<div class="commentBox">' +
+        '<div class="commentBox edit">' +
             '<textarea class="commentTextArea"> ' +
             'If you\'re reading this, then the template was used incorrectly' +
             '</textarea> ' +
@@ -130,5 +130,126 @@ document.addEventListener('mousedown', event => {
         chrome.runtime.sendMessage(message);
     }
 }, true);
+
+document.addEventListener('keydown', keyPress);
+
+function keyPress(event) {
+    // && pressedKeys.o) {
+    if (event.key === 'o') {
+        toggleCards();
+    }
+}
+let allCardsOutToggle = false;
+function toggleCards() {
+    if (allCardsOutToggle) {
+        SlideBackCards();
+        allCardsOutToggle = false;
+    } else {
+        SlideOutCards();
+        allCardsOutToggle = true;
+    }
+}
+
+// An array of id's to slide out
+function SlideOutCards(annotationsToSlide = []) {
+    if (annotationsToSlide.length === 0) {
+        // Slide all annotations
+        annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
+            return annotation.ID;
+        });
+    }
+
+    // Delay for animation in ms
+    let delay = 0;
+    const animationTotalTime = 62;
+    const delayIncrementSize = animationTotalTime / annotationsToSlide.length;
+
+    annotationsToSlide.forEach(annotationId => {
+        const annotationToSlide = document.querySelector('[annotationid="' + annotationId + '"]');
+        setTimeout(() => {
+            annotationToSlide.classList.add('slideOut');
+        }, delay);
+        delay += delayIncrementSize;
+    });
+}
+
+function SlideBackCards(annotationsToSlide = []) {
+    if (annotationsToSlide.length === 0) {
+        // Slide all annotations
+        annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
+            return annotation.ID;
+        });
+    }
+
+    // Delay for animation in ms
+    let delay = 0;
+    const animationTotalTime = 62;
+    const delayIncrementSize = animationTotalTime / annotationsToSlide.length;
+
+    annotationsToSlide.forEach(annotationId => {
+        const annotationToSlide = document.querySelector('[annotationid="' + annotationId + '"]');
+        setTimeout(() => {
+            annotationToSlide.classList.remove('slideOut');
+        }, delay);
+        delay += delayIncrementSize;
+        ;
+    });
+
+    delay = 0;
+}
+
+// Map of element to array of element IDs
+// Eslint is disabled for this line, var is assigned in another file
+// eslint-disable-next-line prefer-const
+let elementAnnotationsMap = {};
+
+function clearElementAnnotationEventMap() {
+    elementAnnotationsMap = {};
+}
+
+function onElementMouseOver(annotatedElem) {
+    if (allCardsOutToggle) {
+        return;
+    }
+
+    const annotatedElemID = annotatedElem.getAttribute('element_audit_id');
+    const annotationCardsToSlide = elementAnnotationsMap[annotatedElemID];
+    SlideOutCards(annotationCardsToSlide);
+}
+
+function onElementMouseLeave(annotatedElem) {
+    if (allCardsOutToggle) {
+        return;
+    }
+
+    const annotatedElemID = annotatedElem.getAttribute('element_audit_id');
+    const annotationCardsToSlide = elementAnnotationsMap[annotatedElemID];
+    SlideBackCards(annotationCardsToSlide);
+}
+
+// selectionText is unused for now
+// Style and attach a hover event
+function attachAnnotatedElementTrigger(annotationId, elementAuditID, selectionText) {
+    const annotatedElem = document.querySelector('[element_audit_id="' + elementAuditID + '"]');
+
+    // Style and hover trigger
+    annotatedElem.classList.add('annotated');
+
+    const annotatedElemID = annotatedElem.getAttribute('element_audit_id');
+
+    if (!elementAnnotationsMap[annotatedElemID]) {
+        elementAnnotationsMap[annotatedElemID] = [annotationId];
+
+        annotatedElem.addEventListener('mouseover', () => {
+            onElementMouseOver(annotatedElem);
+        });
+
+        annotatedElem.addEventListener('mouseleave', () => {
+            onElementMouseLeave(annotatedElem);
+        });
+    } else {
+        elementAnnotationsMap[annotatedElemID].push(annotationId);
+    }
+}
 
 console.log('ready for lift off');

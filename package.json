@@ -1,5 +1,5 @@
 {
-  "name": "Acetate",
+  "name": "acetate",
   "version": "0.1.0",
   "description": "Annotate the web",
   "main": "extension/contentScripts/content.js",
