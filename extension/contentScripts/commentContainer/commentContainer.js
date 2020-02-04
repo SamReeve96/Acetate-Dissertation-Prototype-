@@ -301,6 +301,7 @@ function toggleThread(buttonClick) {
 function cancelAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
+    const shadow = document.querySelector('div#cardsContainer').shadowRoot;
     const annotationIsADraft = draftAnnotations.find(annotation => annotation.ID === annotationId) !== undefined;
 
     // Determine if an edit cancellation or draft cancellation
@@ -311,24 +312,23 @@ function cancelAnnotation(buttonClick) {
         // Remove from drafts
         draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
         // Remove draft element
-        const shadow = document.querySelector('div#cardsContainer').shadowRoot;
         const annotationElement = shadow.querySelector('[annotationId="' + annotationId + '"]');
 
         annotationElement.parentNode.removeChild(annotationElement);
 
         // Remove element id from slide event map object
         const elemAnnotationIdPos = elementAnnotationsMap[draftAnnotationElemId].indexOf(annotationId);
-        elementAnnotationsMap[annotationToDelete.elementAuditID].splice(elemAnnotationIdPos, 1);
+        elementAnnotationsMap[draftAnnotationElemId].splice(elemAnnotationIdPos, 1);
 
         // And, if the last annotation for that element is deleted, remove the highlight
-        if (elementAnnotationsMap[annotationToDelete.elementAuditID].length === 0) {
-            const annotatedElem = document.querySelector('[element_audit_id="' + annotationToDelete.elementAuditID + '"]');
+        if (elementAnnotationsMap[draftAnnotationElemId].length === 0) {
+            const annotatedElem = document.querySelector('[element_audit_id="' + draftAnnotationElemId + '"]');
             annotatedElem.classList.remove('annotated');
         }
     } else {
         // Reset commentBox value
         const annotationIndex = currentAnnotationInstance.annotations.findIndex(annotation => annotation.ID === annotationId);
-        document.querySelector('[annotationId="' + annotationId + '"] textarea').value = currentAnnotationInstance.annotations[annotationIndex].comment;
+        shadow.querySelector('[annotationId="' + annotationId + '"] textarea').value = currentAnnotationInstance.annotations[annotationIndex].comment;
         setEditMode(annotationId, false);
     }
 }
