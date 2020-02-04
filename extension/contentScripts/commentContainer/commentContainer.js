@@ -70,10 +70,11 @@ function sortAnnotations(redrawAnnotations = true) {
 
         // Remove all annotation template elements
         const shadow = document.querySelector('div#cardsContainer').shadowRoot;
-        // NO LONGER WORKS AS THERE ARE NON CARDS INSIDE THE SHADOW DOM EITHER CONTAIN THEM OR WORK AROUND
-        // by only removing if element type is a card
-        while (shadow.firstChild) {
-            shadow.removeChild(shadow.firstChild);
+        const shadowChildCount = shadow.children.length;
+        for (let i = (shadowChildCount - 1); i > 0; i--) {
+            if (shadow.children[i].tagName === 'DIV' && shadow.children[i].classList.contains('commentBox')) {
+                shadow.children[i].remove();
+            }
         }
 
         // Redraw annotations
