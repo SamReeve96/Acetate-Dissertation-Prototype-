@@ -50,8 +50,8 @@ function changeContainerState() {
 function loadExtension() {
     auditElements();
     createCommentContainer();
-    addScriptsToPage();
     loadAnnotationsFromCache();
+    addScriptsToPage();
 }
 
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
@@ -66,93 +66,55 @@ function auditElements() {
 
 // Manage the content container
 function addScriptsToPage() {
-    const shadow = document.querySelector('div#cardsContainer').shadowRoot;
-
-    const cardsContainerURL = chrome.runtime.getURL('/contentScripts/commentContainer/commentContainer.css');
-
+    const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+    const shadowHead = shadow.querySelector('shadowHead');
     // Add google font for now
-    shadow.innerHTML = shadow.innerHTML +
-    "<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>" +
-    // "<link type=text/css href='" + cardsContainerURL + "'>";
-    '<style>' +
-    `div#cardsContainer {
-        background-color: none;
-        font-family: 'roboto', arial;
-        height: 100%;
-        margin: auto;
-        min-height: 100vh;
-        position: absolute;
-        right: -370px;
-        top: 0px;
-        width: 400px;
-        z-index: 9001;
-    }
-    
-    .commentBox {
-        background-color: rgb(53, 53, 53);
-        display: flex;
-        margin-bottom: 5px;
-        max-width: 100%;
-        padding: 5px 25px 5px 30px;
-        transition: all 0.25s ease-in-out;
-            -webkit-transition: all 0.25s ease-in-out; /** Chrome & Safari **/
-            -moz-transition: all 0.25s ease-in-out; /** Firefox **/
-            -o-transition: all 0.25s ease-in-out; /** Opera **/
-    }
-    
-    .commentBox.slideOut, .commentBox:hover, .commentBox.edit {
-        transform: translate(-360px,0);
-        -webkit-transform: translate(-360px,0); /** Chrome & Safari **/
-        -o-transform: translate(-360px,0); /** Opera **/
-        -moz-transform: translate(-360px,0); /** Firefox **/
-    }
-    
-    .commentBox.default, .annotatedElem {
-        background-color: #f3936ecf;
-    }
-    
-    .commentTextArea {
-        flex: 4;
-        min-height: 10em;
-        resize: none;
-    }
-    
-    .controls {
-        flex: 1;
-        height: 100%;
-    }
-    
-    .hidden {
-        display: none;
-    }
-    
-    #containerOptions {
-        margin: auto;
-        width: 80%;
-    }
-    
-    #containerOptions > select, #containerOptions > button {
-        display: block;
-        margin: auto;
-    }` +
-    '</style>';
+    shadowHead.insertAdjacentHTML('afterbegin', "<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>");
+
+    getCardsContainerStyleSheet();
+}
+
+function getCardsContainerStyleSheet() {
+    const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+    const shadowHead = shadow.querySelector('shadowHead');
+
+    const cardsContainerCssURL = chrome.runtime.getURL('/contentScripts/commentContainer/commentContainer.css');
+    fetch(cardsContainerCssURL).then(response => response.text()).then(data => {
+        shadowHead.insertAdjacentHTML('afterbegin', `<style> ${data} </style>`);
+    });
 }
 
 function createCommentContainer() {
-    document.body.innerHTML = document.body.innerHTML +
-    '<div id="cardsContainer">' +
-    // Hidden controls for now, will in the future move to popup js
-    // '<div id="containerOptions">' +
-    //     '<button id="share">Share</button>' +
-    //     '<select id="annotationSort">' +
-    //         '<option value="Element">Sort by Element</option>' +
-    //         '<option value="Created">Sort by Created</option>' +
-    //     '</select>' +
-    // '</div>' +
-    '</div>';
+    // document.body.innerHTML = document.body.innerHTML +
+    // '<div id="shadowContainer">' +
+    // // Hidden controls for now, will in the future move to popup js
+    // // '<div id="containerOptions">' +
+    // //     '<button id="share">Share</button>' +
+    // //     '<select id="annotationSort">' +
+    // //         '<option value="Element">Sort by Element</option>' +
+    // //         '<option value="Created">Sort by Created</option>' +
+    // //     '</select>' +
+    // // '</div>' +
+    // '</div>';
 
-    const cardsContainer = document.querySelector('div#cardsContainer');
-    const shadow = cardsContainer.attachShadow({ mode: 'open' });
+    document.body.insertAdjacentHTML('afterbegin',
+        '<div id="shadowContainer">' +
+        // Hidden controls for now, will in the future move to popup js
+        // '<div id="containerOptions">' +
+        //     '<button id="share">Share</button>' +
+        //     '<select id="annotationSort">' +
+        //         '<option value="Element">Sort by Element</option>' +
+        //         '<option value="Created">Sort by Created</option>' +
+        //     '</select>' +
+        // '</div>' +
+        '</div>'
+    );
+
+    const shadowContainer = document.querySelector('div#shadowContainer');
+    const shadow = shadowContainer.attachShadow({ mode: 'open' });
+
+    const shadowHead = '<shadowHead></shadowHead>';
+    const cardsContainer = '<cardsContainer></cardsContainer>';
 
     // By default a comment box is in edit mode
     const template = '<template>' +
@@ -171,7 +133,7 @@ function createCommentContainer() {
         '</div>' +
     '</template>';
 
-    shadow.innerHTML = template;
+    shadow.innerHTML = shadowHead + cardsContainer + template;
 
     // // If the user has set the theme to be dark mode by default, change to dark mode
     // if (darkModeByDefault) {
@@ -235,7 +197,7 @@ function SlideOutCards(annotationsToSlide, allCards = false) {
     const delayIncrementSize = animationTotalTime / annotationsToSlide.length;
 
     annotationsToSlide.forEach(annotationId => {
-        const shadow = document.querySelector('div#cardsContainer').shadowRoot;
+        const shadow = document.querySelector('div#shadowContainer').shadowRoot;
         const annotationToSlide = shadow.querySelector('[annotationid="' + annotationId + '"]');
         setTimeout(() => {
             annotationToSlide.classList.add('slideOut');
@@ -258,7 +220,7 @@ function SlideBackCards(annotationsToSlide, allCards = false) {
     const delayIncrementSize = animationTotalTime / annotationsToSlide.length;
 
     annotationsToSlide.forEach(annotationId => {
-        const shadow = document.querySelector('div#cardsContainer').shadowRoot;
+        const shadow = document.querySelector('div#shadowContainer').shadowRoot;
         const annotationToSlide = shadow.querySelector('[annotationid="' + annotationId + '"]');
         setTimeout(() => {
             annotationToSlide.classList.remove('slideOut');
