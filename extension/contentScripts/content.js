@@ -42,8 +42,11 @@ chrome.storage.sync.get('activeOnPageLoad', data => {
 function changeContainerState() {
     if (!containerStateActive) {
         loadExtension();
+    } else {
+        unloadExtension();
     }
 
+    // Invert container state
     containerStateActive = !containerStateActive;
 }
 
@@ -52,6 +55,19 @@ function loadExtension() {
     createCommentContainer();
     loadAnnotationsFromCache();
     addScriptsToPage();
+}
+
+function unloadExtension() {
+    // (For now, not un-auditing elements, they shouldn't cause any unexpected effects)
+    removeCardContainerShadow();
+    removeAnnotatedElemStyling();
+    clearElementAnnotationEventMap();
+}
+
+function removeCardContainerShadow() {
+    // Remove Shadow container
+    var shadowContainer = document.querySelector('#shadowContainer');
+    shadowContainer.parentNode.removeChild(shadowContainer);
 }
 
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
@@ -184,6 +200,10 @@ function toggleCards() {
 
 // An array of id's to slide out
 function SlideOutCards(annotationsToSlide, allCards = false) {
+    if (!containerStateActive) {
+        return;
+    }
+
     if (allCards) {
         // Slide all annotations
         annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
@@ -207,6 +227,10 @@ function SlideOutCards(annotationsToSlide, allCards = false) {
 }
 
 function SlideBackCards(annotationsToSlide, allCards = false) {
+    if (!containerStateActive) {
+        return;
+    }
+
     if (allCards) {
         // Slide all annotations
         annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {

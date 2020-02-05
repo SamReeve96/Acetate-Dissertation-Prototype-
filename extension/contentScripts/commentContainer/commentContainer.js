@@ -394,6 +394,16 @@ function displayAnnotation(annotation) {
     attachAnnotatedElementTrigger(annotation.ID, annotation.elementAuditID, annotation.selectionText);
 }
 
+function removeAnnotatedElemStyling() {
+    // Iterate over the styled elements
+    const annotatedElems = document.getElementsByClassName('annotated');
+    const annotatedElemsCount = annotatedElems.length;
+
+    for (let i = 0; i < annotatedElemsCount; i++) {
+        annotatedElems[0].classList.remove('annotated');
+    }
+}
+
 // function checkTheme() {
 //     const cardsContainer = document.querySelector('div#shadowContainer');
 //     return cardsContainer.classList.contains('dark');
