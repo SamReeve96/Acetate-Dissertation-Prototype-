@@ -212,17 +212,17 @@ function keyPress(event) {
 let allCardsOutToggle = false;
 function toggleCards() {
     if (allCardsOutToggle) {
-        SlideBackCards();
+        SlideBackCards(undefined, true);
         allCardsOutToggle = false;
     } else {
-        SlideOutCards();
+        SlideOutCards(undefined, true);
         allCardsOutToggle = true;
     }
 }
 
 // An array of id's to slide out
-function SlideOutCards(annotationsToSlide = []) {
-    if (annotationsToSlide.length === 0) {
+function SlideOutCards(annotationsToSlide, allCards = false) {
+    if (allCards) {
         // Slide all annotations
         annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
             return annotation.ID;
@@ -244,8 +244,8 @@ function SlideOutCards(annotationsToSlide = []) {
     });
 }
 
-function SlideBackCards(annotationsToSlide = []) {
-    if (annotationsToSlide.length === 0) {
+function SlideBackCards(annotationsToSlide, allCards = false) {
+    if (allCards) {
         // Slide all annotations
         annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
             return annotation.ID;
