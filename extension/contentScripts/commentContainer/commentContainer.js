@@ -69,9 +69,11 @@ function sortAnnotations(redrawAnnotations = true) {
         clearElementAnnotationEventMap();
 
         // Remove all annotation template elements
-        const commentsElem = document.querySelector('commentscontainer');
-        while (commentsElem.firstChild) {
-            commentsElem.removeChild(commentsElem.firstChild);
+        const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+        const cardsContainer = shadow.querySelector('cardsContainer');
+        const numberOfCards = cardsContainer.children.length;
+        for (let i = 0; i < numberOfCards; i++) {
+            cardsContainer.firstChild.remove();
         }
 
         // Redraw annotations
@@ -172,15 +174,16 @@ function getIDFromButtonClick(clickEvent) {
 
 function setEditMode(annotationId, editMode = true) {
     // Update Controls for that annotation
+    const shadow = document.querySelector('div#shadowContainer').shadowRoot;
     const selectorPrefix = '[annotationId="' + annotationId + '"]';
-    const annotationCard = document.querySelector(selectorPrefix);
-    const annotateButton = document.querySelector(selectorPrefix + ' #annotate');
-    const updateButton = document.querySelector(selectorPrefix + ' #update');
-    const deleteButton = document.querySelector(selectorPrefix + ' #delete');
-    const editButton = document.querySelector(selectorPrefix + ' #edit');
-    const threadButton = document.querySelector(selectorPrefix + ' #thread');
-    const cancelButton = document.querySelector(selectorPrefix + ' #cancel');
-    const textArea = document.querySelector(selectorPrefix + ' textarea');
+    const annotationCard = shadow.querySelector(selectorPrefix);
+    const annotateButton = shadow.querySelector(selectorPrefix + ' #annotate');
+    const updateButton = shadow.querySelector(selectorPrefix + ' #update');
+    const deleteButton = shadow.querySelector(selectorPrefix + ' #delete');
+    const editButton = shadow.querySelector(selectorPrefix + ' #edit');
+    const threadButton = shadow.querySelector(selectorPrefix + ' #thread');
+    const cancelButton = shadow.querySelector(selectorPrefix + ' #cancel');
+    const textArea = shadow.querySelector(selectorPrefix + ' textarea');
 
     // Only visible in draft state
     annotationCard.classList.remove('edit');
@@ -218,7 +221,8 @@ function saveAnnotation(buttonClick) {
     }
 
     // The annotation currently in drafts that will be moved to the instance array
-    draftAnnotation.comment = document.querySelector('[annotationId="' + annotationId + '"] textarea').value;
+    const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+    draftAnnotation.comment = shadow.querySelector('[annotationId="' + annotationId + '"] textarea').value;
     currentAnnotationInstance.annotations.push(draftAnnotation);
     cacheInstance();
     // Then upload to db
@@ -248,8 +252,9 @@ function deleteAnnotation(buttonClick) {
     // Then remove from DB
     // Implementing at beta
 
-    // Remove html element
-    const annotationElement = document.querySelector('[annotationId="' + annotationId + '"]');
+    // Remove html element0
+    const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+    const annotationElement = shadow.querySelector('[annotationId="' + annotationId + '"]');
     annotationElement.parentNode.removeChild(annotationElement);
 
     // Remove content modifications eventlistener
@@ -276,7 +281,8 @@ function updateAnnotation(buttonClick) {
     if (annotationIndex >= 0) {
         const annotationToUpdate = currentAnnotationInstance.annotations[annotationIndex];
         // Right now editing just the annotation comment
-        const annotationText = document.querySelector('[annotationId="' + annotationId + '"] textarea').value;
+        const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+        const annotationText = shadow.querySelector('[annotationId="' + annotationId + '"] textarea').value;
         annotationToUpdate.comment = annotationText;
         annotationToUpdate.lastUpdated = Date.now();
 
@@ -294,6 +300,7 @@ function toggleThread(buttonClick) {
 function cancelAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
+    const shadow = document.querySelector('div#shadowContainer').shadowRoot;
     const annotationIsADraft = draftAnnotations.find(annotation => annotation.ID === annotationId) !== undefined;
 
     // Determine if an edit cancellation or draft cancellation
@@ -304,31 +311,31 @@ function cancelAnnotation(buttonClick) {
         // Remove from drafts
         draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
         // Remove draft element
-        const annotationElement = document.querySelector('[annotationId="' + annotationId + '"]');
+        const annotationElement = shadow.querySelector('[annotationId="' + annotationId + '"]');
 
         annotationElement.parentNode.removeChild(annotationElement);
 
         // Remove element id from slide event map object
         const elemAnnotationIdPos = elementAnnotationsMap[draftAnnotationElemId].indexOf(annotationId);
-        elementAnnotationsMap[annotationToDelete.elementAuditID].splice(elemAnnotationIdPos, 1);
+        elementAnnotationsMap[draftAnnotationElemId].splice(elemAnnotationIdPos, 1);
 
         // And, if the last annotation for that element is deleted, remove the highlight
-        if (elementAnnotationsMap[annotationToDelete.elementAuditID].length === 0) {
-            const annotatedElem = document.querySelector('[element_audit_id="' + annotationToDelete.elementAuditID + '"]');
+        if (elementAnnotationsMap[draftAnnotationElemId].length === 0) {
+            const annotatedElem = document.querySelector('[element_audit_id="' + draftAnnotationElemId + '"]');
             annotatedElem.classList.remove('annotated');
         }
     } else {
         // Reset commentBox value
         const annotationIndex = currentAnnotationInstance.annotations.findIndex(annotation => annotation.ID === annotationId);
-        document.querySelector('[annotationId="' + annotationId + '"] textarea').value = currentAnnotationInstance.annotations[annotationIndex].comment;
+        shadow.querySelector('[annotationId="' + annotationId + '"] textarea').value = currentAnnotationInstance.annotations[annotationIndex].comment;
         setEditMode(annotationId, false);
     }
 }
 
 // Show annotation
 function displayAnnotation(annotation) {
-    const commentsDiv = document.querySelector('commentscontainer');
-    const commentBoxTemplate = document.querySelector('template');
+    const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+    const commentBoxTemplate = shadow.querySelector('template');
 
     // Create new comment instance
     const cloneCommentBox = document.importNode(commentBoxTemplate.content, true);
@@ -371,41 +378,52 @@ function displayAnnotation(annotation) {
     // For demo populate annotation with selected text
     const annotationTextBox = cloneCommentBox.querySelector('textarea');
 
-    annotationTextBox.value = annotation.comment;
+    annotationTextBox.innerHTML = annotation.comment;
 
-    // Apply theme styles if needed
-    const isInDarkMode = checkTheme();
+    // // Apply theme styles if needed
+    // const isInDarkMode = checkTheme();
 
-    if (isInDarkMode) {
-        annotationTextBox.classList.add('dark');
-    }
+    // if (isInDarkMode) {
+    //     annotationTextBox.classList.add('dark');
+    // }
 
-    commentsDiv.appendChild(cloneCommentBox);
+    const cardsContainer = shadow.querySelector('cardsContainer');
+    cardsContainer.appendChild(cloneCommentBox);
 
     // Add hover event trigger to annotated elem in content.js
     attachAnnotatedElementTrigger(annotation.ID, annotation.elementAuditID, annotation.selectionText);
 }
 
-function checkTheme() {
-    const commentsContainer = document.querySelector('commentscontainer');
-    return commentsContainer.classList.contains('dark');
-}
+function removeAnnotatedElemStyling() {
+    // Iterate over the styled elements
+    const annotatedElems = document.getElementsByClassName('annotated');
+    const annotatedElemsCount = annotatedElems.length;
 
-function changeTheme() {
-    const commentsContainer = document.querySelector('commentscontainer');
-    const commentTextAreas = [...document.getElementsByClassName('commentTextArea')];
-
-    const isInDarkMode = checkTheme();
-
-    if (isInDarkMode) {
-        // Remove dark mode classes
-        commentsContainer.classList.remove('dark');
-        commentTextAreas.forEach(cta => {
-            cta.classList.remove('dark');
-        });
-    } else {
-        // Add dark mode classes
-        commentsContainer.classList.add('dark');
-        commentTextAreas.forEach(cta => cta.classList.add('dark'));
+    for (let i = 0; i < annotatedElemsCount; i++) {
+        annotatedElems[0].classList.remove('annotated');
     }
 }
+
+// function checkTheme() {
+//     const cardsContainer = document.querySelector('div#shadowContainer');
+//     return cardsContainer.classList.contains('dark');
+// }
+
+// function changeTheme() {
+//     const cardsContainer = document.querySelector('div#shadowContainer');
+//     const commentTextAreas = [...document.getElementsByClassName('commentTextArea')];
+
+//     const isInDarkMode = checkTheme();
+
+//     if (isInDarkMode) {
+//         // Remove dark mode classes
+//         cardsContainer.classList.remove('dark');
+//         commentTextAreas.forEach(cta => {
+//             cta.classList.remove('dark');
+//         });
+//     } else {
+//         // Add dark mode classes
+//         cardsContainer.classList.add('dark');
+//         commentTextAreas.forEach(cta => cta.classList.add('dark'));
+//     }
+// }

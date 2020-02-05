@@ -42,16 +42,32 @@ chrome.storage.sync.get('activeOnPageLoad', data => {
 function changeContainerState() {
     if (!containerStateActive) {
         loadExtension();
+    } else {
+        unloadExtension();
     }
 
+    // Invert container state
     containerStateActive = !containerStateActive;
 }
 
 function loadExtension() {
-    addScriptsToPage();
     auditElements();
     createCommentContainer();
     loadAnnotationsFromCache();
+    addScriptsToPage();
+}
+
+function unloadExtension() {
+    // (For now, not un-auditing elements, they shouldn't cause any unexpected effects)
+    removeCardContainerShadow();
+    removeAnnotatedElemStyling();
+    clearElementAnnotationEventMap();
+}
+
+function removeCardContainerShadow() {
+    // Remove Shadow container
+    var shadowContainer = document.querySelector('#shadowContainer');
+    shadowContainer.parentNode.removeChild(shadowContainer);
 }
 
 // Label all elements on the page we can authenticate an element is the same as it was when created by comparing auditID and element type
@@ -66,28 +82,58 @@ function auditElements() {
 
 // Manage the content container
 function addScriptsToPage() {
+    const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+    const shadowHead = shadow.querySelector('shadowHead');
     // Add google font for now
-    document.head.innerHTML = document.head.innerHTML +
-    "<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>";
+    shadowHead.insertAdjacentHTML('afterbegin', "<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>");
+
+    getCardsContainerStyleSheet();
+}
+
+function getCardsContainerStyleSheet() {
+    const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+    const shadowHead = shadow.querySelector('shadowHead');
+
+    const cardsContainerCssURL = chrome.runtime.getURL('/contentScripts/commentContainer/commentContainer.css');
+    fetch(cardsContainerCssURL).then(response => response.text()).then(data => {
+        shadowHead.insertAdjacentHTML('afterbegin', `<style> ${data} </style>`);
+    });
 }
 
 function createCommentContainer() {
-    document.body.innerHTML = document.body.innerHTML +
-    '<commentsContainer>' +
+    // document.body.innerHTML = document.body.innerHTML +
+    // '<div id="shadowContainer">' +
+    // // Hidden controls for now, will in the future move to popup js
+    // // '<div id="containerOptions">' +
+    // //     '<button id="share">Share</button>' +
+    // //     '<select id="annotationSort">' +
+    // //         '<option value="Element">Sort by Element</option>' +
+    // //         '<option value="Created">Sort by Created</option>' +
+    // //     '</select>' +
+    // // '</div>' +
+    // '</div>';
 
-    // Hidden controls for now, will in the future move to popup js
-    // '<div id="containerOptions">' +
-    //     '<button id="share">Share</button>' +
-    //     '<select id="annotationSort">' +
-    //         '<option value="Element">Sort by Element</option>' +
-    //         '<option value="Created">Sort by Created</option>' +
-    //     '</select>' +
-    // '</div>' +
+    document.body.insertAdjacentHTML('afterbegin',
+        '<div id="shadowContainer">' +
+        // Hidden controls for now, will in the future move to popup js
+        // '<div id="containerOptions">' +
+        //     '<button id="share">Share</button>' +
+        //     '<select id="annotationSort">' +
+        //         '<option value="Element">Sort by Element</option>' +
+        //         '<option value="Created">Sort by Created</option>' +
+        //     '</select>' +
+        // '</div>' +
+        '</div>'
+    );
 
-    '</commentsContainer>' +
+    const shadowContainer = document.querySelector('div#shadowContainer');
+    const shadow = shadowContainer.attachShadow({ mode: 'open' });
+
+    const shadowHead = '<shadowHead></shadowHead>';
+    const cardsContainer = '<cardsContainer></cardsContainer>';
 
     // By default a comment box is in edit mode
-    '<template>' +
+    const template = '<template>' +
         '<div class="commentBox edit">' +
             '<textarea class="commentTextArea"> ' +
             'If you\'re reading this, then the template was used incorrectly' +
@@ -103,10 +149,12 @@ function createCommentContainer() {
         '</div>' +
     '</template>';
 
-    // If the user has set the theme to be dark mode by default, change to dark mode
-    if (darkModeByDefault) {
-        changeTheme();
-    }
+    shadow.innerHTML = shadowHead + cardsContainer + template;
+
+    // // If the user has set the theme to be dark mode by default, change to dark mode
+    // if (darkModeByDefault) {
+    //     changeTheme();
+    // }
 
     // let sortDropdown = document.querySelector('select#annotationSort');
     // sortDropdown.addEventListener('change', function () {
@@ -142,17 +190,21 @@ function keyPress(event) {
 let allCardsOutToggle = false;
 function toggleCards() {
     if (allCardsOutToggle) {
-        SlideBackCards();
+        SlideBackCards(undefined, true);
         allCardsOutToggle = false;
     } else {
-        SlideOutCards();
+        SlideOutCards(undefined, true);
         allCardsOutToggle = true;
     }
 }
 
 // An array of id's to slide out
-function SlideOutCards(annotationsToSlide = []) {
-    if (annotationsToSlide.length === 0) {
+function SlideOutCards(annotationsToSlide, allCards = false) {
+    if (!containerStateActive) {
+        return;
+    }
+
+    if (allCards) {
         // Slide all annotations
         annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
             return annotation.ID;
@@ -165,7 +217,8 @@ function SlideOutCards(annotationsToSlide = []) {
     const delayIncrementSize = animationTotalTime / annotationsToSlide.length;
 
     annotationsToSlide.forEach(annotationId => {
-        const annotationToSlide = document.querySelector('[annotationid="' + annotationId + '"]');
+        const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+        const annotationToSlide = shadow.querySelector('[annotationid="' + annotationId + '"]');
         setTimeout(() => {
             annotationToSlide.classList.add('slideOut');
         }, delay);
@@ -173,8 +226,12 @@ function SlideOutCards(annotationsToSlide = []) {
     });
 }
 
-function SlideBackCards(annotationsToSlide = []) {
-    if (annotationsToSlide.length === 0) {
+function SlideBackCards(annotationsToSlide, allCards = false) {
+    if (!containerStateActive) {
+        return;
+    }
+
+    if (allCards) {
         // Slide all annotations
         annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
             return annotation.ID;
@@ -187,7 +244,8 @@ function SlideBackCards(annotationsToSlide = []) {
     const delayIncrementSize = animationTotalTime / annotationsToSlide.length;
 
     annotationsToSlide.forEach(annotationId => {
-        const annotationToSlide = document.querySelector('[annotationid="' + annotationId + '"]');
+        const shadow = document.querySelector('div#shadowContainer').shadowRoot;
+        const annotationToSlide = shadow.querySelector('[annotationid="' + annotationId + '"]');
         setTimeout(() => {
             annotationToSlide.classList.remove('slideOut');
         }, delay);
