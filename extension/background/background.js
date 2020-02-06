@@ -1,18 +1,30 @@
-// Add listener to change extension state (triggered by popup.js)
-chrome.runtime.onMessage.addListener(handleMessage);
-function handleMessage(request) {
-    switch (request.type) {
+// Add listener for messaged
+chrome.runtime.onMessage.addListener(message => {
+    handleMessage(message);
+});
+
+function handleMessage(message) {
+    switch (message.type) {
     case 'changeActiveState':
         sendChangeContainerState();
         break;
     case 'setNewContextElement':
-        setContextElementData(request);
+        setContextElementData(message);
         break;
     case 'cacheInstance':
-        cacheInstance(request.instance);
+        cacheInstance(message.instance);
         break;
     case 'loadFromCache':
-        sendLoadFromCache(request.key);
+        sendLoadFromCache(message.key);
+        break;
+    case 'changeAnnotationSort':
+        sendChangeAnnotationSort(message.newSortOrder);
+        break;
+    case 'getCachedSortOrder_Popup':
+        returnCachedSortOrderToPopup();
+        break;
+    case 'getCachedSortOrder_Content':
+        returnCachedSortOrderToContent();
         break;
     }
 }
@@ -29,6 +41,39 @@ chrome.browserAction.onClicked.addListener(tab => {
     });
 });
 
+// Ways the annotation cards can be ordered
+const annotationSortMode = {
+    ELEMENT: 'Element',
+    CREATED: 'Created'
+};
+
+let cachedSortOrder = annotationSortMode.ELEMENT;
+
+function returnCachedSortOrderToPopup() {
+    // Send message to backend to change active state
+    const message = {
+        type: 'returnCachedSortOrder',
+        sortOrder: cachedSortOrder
+    };
+
+    chrome.runtime.sendMessage(message);
+}
+
+function returnCachedSortOrderToContent() {
+    // Send message to backend to change active state
+    const message = {
+        type: 'returnCachedSortOrder',
+        sortOrder: cachedSortOrder
+    };
+
+    // Send message
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, message, () => {
+            console.log('changeContainerState message sent');
+        });
+    });
+}
+
 function sendChangeContainerState() {
     // Inform content script to change container state
     const message = {
@@ -38,7 +83,25 @@ function sendChangeContainerState() {
     // Send message
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, message, () => {
-            console.log('message sent');
+            console.log('changeContainerState message sent');
+        });
+    });
+}
+
+function sendChangeAnnotationSort(newSortOrder) {
+    // As the sort is changing, change the cache
+    cachedSortOrder = newSortOrder;
+
+    // Inform content script to change card sort order
+    const message = {
+        type: 'sortAnnotations',
+        newSortOrder: cachedSortOrder
+    };
+
+    // Send message
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, message, () => {
+            console.log('changeAnnotationSort message sent');
         });
     });
 }
@@ -91,10 +154,6 @@ function sendCreateAnnotation(info, tab) {
     // Reset the context element
     contextElement = undefined;
 }
-
-chrome.storage.sync.set({ darkModeByDefault: true }, () => {
-    console.log("by default, the extension is in dark mode, because it's dark mode");
-});
 
 // Store the annotation instance in chrome sync storage
 function cacheInstance(currentInstance) {

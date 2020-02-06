@@ -1,6 +1,34 @@
-const activateButton = document.getElementById('Activate');
+let cachedSortOrder;
+const sortDropdown = document.querySelector('#annotationCardSort');
 
+function getCachedSortOrder() {
+    // Send message to backend to change active state
+    const message = {
+        type: 'getCachedSortOrder_Popup'
+    };
+
+    chrome.runtime.sendMessage(message);
+}
+
+function handleMessage(message) {
+    switch (message.type) {
+    case 'returnCachedSortOrder':
+        cachedSortOrder = message.sortOrder;
+        sortDropdown.value = message.sortOrder;
+        break;
+    }
+}
+
+// Add listener for messaged
+chrome.runtime.onMessage.addListener(message => {
+    handleMessage(message);
+});
+
+getCachedSortOrder();
+
+const activateButton = document.getElementById('Activate');
 activateButton.onclick = function() {
+    // Send message to backend to change active state
     const message = {
         type: 'changeActiveState'
     };
@@ -8,16 +36,12 @@ activateButton.onclick = function() {
     chrome.runtime.sendMessage(message);
 };
 
-const darkModeButton = document.getElementById('DarkMode');
-darkModeButton.addEventListener('click', () => {
+sortDropdown.addEventListener('change', () => {
+    // Send a message to backend to change sort order
     const message = {
-        type: 'changeTheme'
+        type: 'changeAnnotationSort',
+        newSortOrder: sortDropdown.value
     };
 
-    // Send message
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, message, () => {
-            console.log('message sent');
-        });
-    });
+    chrome.runtime.sendMessage(message);
 });

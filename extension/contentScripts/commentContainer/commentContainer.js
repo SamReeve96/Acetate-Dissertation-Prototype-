@@ -22,31 +22,19 @@ const annotationSortMode = {
     CREATED: 'Created'
 };
 
-// Assign a default sort order
-let annotationSort = annotationSortMode.ELEMENT;
+let cachedSortOrder;
 
-function changeSort() {
-    // document.querySelector('select#annotationSort').value;
-    // Made change sort default to always change to Element as theres no UI option alter it currently
-    // Not using the object here as this simulates the string being read from the dropdown option
-    const sortOrder = 'Element';
+function getCachedSortOrder() {
+    // Send message to backend to change active state
+    const message = {
+        type: 'getCachedSortOrder_Content'
+    };
 
-    if (draftAnnotations.length > 0) {
-        alert('Please delete or save current draft');
-        // Reset dropdown
-        // document.querySelector('select#annotationSort').value = annotationSort;
-    } else if (currentAnnotationInstance.annotations.length < 1) {
-        alert('Nothing to sort... Annotate some things first!');
-        // Reset dropdown
-        // document.querySelector('select#annotationSort').value = annotationSort;
-    } else {
-        annotationSort = (sortOrder === annotationSortMode.ELEMENT) ? annotationSortMode.ELEMENT : annotationSortMode.CREATED;
-        sortAnnotations();
-    }
+    chrome.runtime.sendMessage(message);
 }
 
-function sortAnnotations(redrawAnnotations = true) {
-    if (annotationSort === annotationSortMode.ELEMENT) {
+function sortAnnotations(newSortOrder, redrawAnnotations = true) {
+    if (newSortOrder === annotationSortMode.ELEMENT) {
         currentAnnotationInstance.annotations.sort((annotation1, annotation2) => {
             if (annotation1.elementAuditID > annotation2.elementAuditID) {
                 return 1;
@@ -58,7 +46,7 @@ function sortAnnotations(redrawAnnotations = true) {
                 return annotation1.created - annotation2.created;
             }
         });
-    } else if (annotationSort === annotationSortMode.CREATED) {
+    } else if (newSortOrder === annotationSortMode.CREATED) {
         currentAnnotationInstance.annotations.sort((annotation1, annotation2) => {
             return annotation1.created - annotation2.created;
         });
@@ -138,7 +126,7 @@ function loadAnnotationsFromCache() {
                 currentAnnotationInstance = filteredInstances[0];
 
                 // Sort Annotations before displaying them
-                sortAnnotations(false);
+                sortAnnotations(annotationSortMode.ELEMENT, false);
 
                 // For all annotations, load
                 currentAnnotationInstance.annotations.forEach(annotation => {
@@ -231,7 +219,7 @@ function saveAnnotation(buttonClick) {
     draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
 
     // Resort annotations to move ex-draft to correct position
-    sortAnnotations();
+    sortAnnotations(cachedSortOrder);
 }
 
 function deleteAnnotation(buttonClick) {

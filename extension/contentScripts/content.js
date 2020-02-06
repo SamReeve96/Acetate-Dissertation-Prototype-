@@ -3,13 +3,6 @@
 // Initialize active state variable
 let containerStateActive = false;
 
-// Check if the comments panel should be in dark mode by default
-let darkModeByDefault;
-
-chrome.storage.sync.get('darkModeByDefault', data => {
-    darkModeByDefault = data.darkModeByDefault;
-});
-
 // Add listener for messages from backend
 chrome.extension.onMessage.addListener(handleMessage);
 function handleMessage(request) {
@@ -20,8 +13,11 @@ function handleMessage(request) {
     case 'createAnnotation':
         createDraftAnnotation(request.content);
         break;
-    case 'changeTheme':
-        changeTheme();
+    case 'sortAnnotations':
+        sortAnnotations(request.newSortOrder);
+        break;
+    case 'returnCachedSortOrder':
+        cachedSortOrder = request.sortOrder;
         break;
     }
 }
@@ -51,6 +47,7 @@ function changeContainerState() {
 }
 
 function loadExtension() {
+    getCachedSortOrder();
     auditElements();
     createCommentContainer();
     loadAnnotationsFromCache();
@@ -101,29 +98,8 @@ function getCardsContainerStyleSheet() {
 }
 
 function createCommentContainer() {
-    // document.body.innerHTML = document.body.innerHTML +
-    // '<div id="shadowContainer">' +
-    // // Hidden controls for now, will in the future move to popup js
-    // // '<div id="containerOptions">' +
-    // //     '<button id="share">Share</button>' +
-    // //     '<select id="annotationSort">' +
-    // //         '<option value="Element">Sort by Element</option>' +
-    // //         '<option value="Created">Sort by Created</option>' +
-    // //     '</select>' +
-    // // '</div>' +
-    // '</div>';
-
     document.body.insertAdjacentHTML('afterbegin',
-        '<div id="shadowContainer">' +
-        // Hidden controls for now, will in the future move to popup js
-        // '<div id="containerOptions">' +
-        //     '<button id="share">Share</button>' +
-        //     '<select id="annotationSort">' +
-        //         '<option value="Element">Sort by Element</option>' +
-        //         '<option value="Created">Sort by Created</option>' +
-        //     '</select>' +
-        // '</div>' +
-        '</div>'
+        '<div id="shadowContainer"></div>'
     );
 
     const shadowContainer = document.querySelector('div#shadowContainer');
@@ -150,16 +126,6 @@ function createCommentContainer() {
     '</template>';
 
     shadow.innerHTML = shadowHead + cardsContainer + template;
-
-    // // If the user has set the theme to be dark mode by default, change to dark mode
-    // if (darkModeByDefault) {
-    //     changeTheme();
-    // }
-
-    // let sortDropdown = document.querySelector('select#annotationSort');
-    // sortDropdown.addEventListener('change', function () {
-    //     changeSort();
-    // });
 }
 
 // Work out what element was right clicked
