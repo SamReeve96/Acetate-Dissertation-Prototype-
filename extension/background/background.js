@@ -18,7 +18,13 @@ function handleMessage(message) {
         sendLoadFromCache(message.key);
         break;
     case 'changeAnnotationSort':
-        sendChangeAnnotationSort();
+        sendChangeAnnotationSort(message.newSortOrder);
+        break;
+    case 'getCachedSortOrder_Popup':
+        returnCachedSortOrderToPopup();
+        break;
+    case 'getCachedSortOrder_Content':
+        returnCachedSortOrderToContent();
         break;
     }
 }
@@ -35,6 +41,39 @@ chrome.browserAction.onClicked.addListener(tab => {
     });
 });
 
+// Ways the annotation cards can be ordered
+const annotationSortMode = {
+    ELEMENT: 'Element',
+    CREATED: 'Created'
+};
+
+let cachedSortOrder = annotationSortMode.ELEMENT;
+
+function returnCachedSortOrderToPopup() {
+    // Send message to backend to change active state
+    const message = {
+        type: 'returnCachedSortOrder',
+        sortOrder: cachedSortOrder
+    };
+
+    chrome.runtime.sendMessage(message);
+}
+
+function returnCachedSortOrderToContent() {
+    // Send message to backend to change active state
+    const message = {
+        type: 'returnCachedSortOrder',
+        sortOrder: cachedSortOrder
+    };
+
+    // Send message
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, message, () => {
+            console.log('changeContainerState message sent');
+        });
+    });
+}
+
 function sendChangeContainerState() {
     // Inform content script to change container state
     const message = {
@@ -49,10 +88,14 @@ function sendChangeContainerState() {
     });
 }
 
-function sendChangeAnnotationSort() {
+function sendChangeAnnotationSort(newSortOrder) {
+    // As the sort is changing, change the cache
+    cachedSortOrder = newSortOrder;
+
     // Inform content script to change card sort order
     const message = {
-        type: 'changeAnnotationSort'
+        type: 'sortAnnotations',
+        newSortOrder: cachedSortOrder
     };
 
     // Send message

@@ -13,8 +13,11 @@ function handleMessage(request) {
     case 'createAnnotation':
         createDraftAnnotation(request.content);
         break;
-    case 'changeAnnotationSort':
-        changeSort();
+    case 'sortAnnotations':
+        sortAnnotations(request.newSortOrder);
+        break;
+    case 'returnCachedSortOrder':
+        cachedSortOrder = request.sortOrder;
         break;
     }
 }
@@ -44,6 +47,7 @@ function changeContainerState() {
 }
 
 function loadExtension() {
+    getCachedSortOrder();
     auditElements();
     createCommentContainer();
     loadAnnotationsFromCache();
