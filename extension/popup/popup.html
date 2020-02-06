@@ -2,16 +2,31 @@
   <html>
     <head>
       <style>
+        body {
+          display: inline-block;
+          height: 200px;
+          width: 300px;
+        }
         button {
-          height: 100vw;
-          width: 100px;
+          height: 3em;
+          margin: 15px auto;
           outline: none;
+          width: 15em;
+        }
+        p {
+          width: 100%
         }
       </style>
     </head>
     <body>
+      <p>This extension is in alpha, so bugs are likely. Find any good ones? me know @ </p>
+      <p>www.github.com/SamReeve96/Acetate</p>
       <button id="Activate">Open/Close Acetate</button>
-      <button id="DarkMode">Toggle Theme</button>
-      <script src="popup.js"></script>
+      <button id="share">Share</button>
+      <select id="annotationCardSort">
+        <option value="Element">Sort by Element</option>
+        <option value="Created">Sort by Created</option>
+      </select>
     </body>
+    <script src="popup.js"></script>
   </html>

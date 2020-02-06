@@ -1,18 +1,24 @@
-// Add listener to change extension state (triggered by popup.js)
-chrome.runtime.onMessage.addListener(handleMessage);
-function handleMessage(request) {
-    switch (request.type) {
+// Add listener for messaged
+chrome.runtime.onMessage.addListener(message => {
+    handleMessage(message);
+});
+
+function handleMessage(message) {
+    switch (message.type) {
     case 'changeActiveState':
         sendChangeContainerState();
         break;
     case 'setNewContextElement':
-        setContextElementData(request);
+        setContextElementData(message);
         break;
     case 'cacheInstance':
-        cacheInstance(request.instance);
+        cacheInstance(message.instance);
         break;
     case 'loadFromCache':
-        sendLoadFromCache(request.key);
+        sendLoadFromCache(message.key);
+        break;
+    case 'changeAnnotationSort':
+        sendChangeAnnotationSort();
         break;
     }
 }
@@ -38,7 +44,21 @@ function sendChangeContainerState() {
     // Send message
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, message, () => {
-            console.log('message sent');
+            console.log('changeContainerState message sent');
+        });
+    });
+}
+
+function sendChangeAnnotationSort() {
+    // Inform content script to change card sort order
+    const message = {
+        type: 'changeAnnotationSort'
+    };
+
+    // Send message
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, message, () => {
+            console.log('changeAnnotationSort message sent');
         });
     });
 }
@@ -91,10 +111,6 @@ function sendCreateAnnotation(info, tab) {
     // Reset the context element
     contextElement = undefined;
 }
-
-chrome.storage.sync.set({ darkModeByDefault: true }, () => {
-    console.log("by default, the extension is in dark mode, because it's dark mode");
-});
 
 // Store the annotation instance in chrome sync storage
 function cacheInstance(currentInstance) {

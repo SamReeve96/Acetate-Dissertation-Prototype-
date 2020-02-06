@@ -1,6 +1,6 @@
 const activateButton = document.getElementById('Activate');
-
 activateButton.onclick = function() {
+    // Send message to backend to change active state
     const message = {
         type: 'changeActiveState'
     };
@@ -8,16 +8,12 @@ activateButton.onclick = function() {
     chrome.runtime.sendMessage(message);
 };
 
-const darkModeButton = document.getElementById('DarkMode');
-darkModeButton.addEventListener('click', () => {
+const sortDropdown = document.querySelector('#annotationCardSort');
+sortDropdown.addEventListener('change', () => {
+    // Send a message to backend to change sort order
     const message = {
-        type: 'changeTheme'
+        type: 'changeAnnotationSort'
     };
 
-    // Send message
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, message, () => {
-            console.log('message sent');
-        });
-    });
+    chrome.runtime.sendMessage(message);
 });

@@ -29,7 +29,7 @@ function changeSort() {
     // document.querySelector('select#annotationSort').value;
     // Made change sort default to always change to Element as theres no UI option alter it currently
     // Not using the object here as this simulates the string being read from the dropdown option
-    const sortOrder = 'Element';
+    const sortOrder = 'Created';
 
     if (draftAnnotations.length > 0) {
         alert('Please delete or save current draft');
