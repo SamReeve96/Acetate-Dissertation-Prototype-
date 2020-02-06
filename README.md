@@ -13,7 +13,7 @@ The purpose of the prototype was to create an interactive demo that could be sho
 
 Note the prototype's method of wrapping the page was not built to be used as an actual solution, but for speed of implementation, it will break event listeners and combat with CSS rules. So far a good example of a page that reacts well is bbc.co.uk
 
-![Image of Prototype](https://github.com/SamReeve96/Acetate/blob/master/Misc%20Resources/PrototypeOneScreenshot-20012020.png?raw=true)
+![Image of Prototype](https://github.com/SamReeve96/Acetate/blob/master/Misc%20Resources/Images/PrototypeOneScreenshot-20012020.png?raw=true)
 
 ### Alpha
 The Alpha will take feedback from the prototype to influence the design of the extension and resolve any known bugs or issues.
