@@ -1,0 +1,19 @@
+h1 {
+    color: rgb(206, 158, 0);
+}
+
+p {
+    width: 100%;
+}
+
+body {
+    background-color: whitesmoke;
+}
+
+p, h1, h2 {
+    font-family: Roboto, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#testImage {
+    max-height: 300px;
+}
