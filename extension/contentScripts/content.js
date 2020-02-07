@@ -14,6 +14,7 @@ function handleMessage(request) {
         createDraftAnnotation(request.content);
         break;
     case 'sortAnnotations':
+        cachedSortOrder = request.newSortOrder;
         sortAnnotations(request.newSortOrder);
         break;
     case 'returnCachedSortOrder':
