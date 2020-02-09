@@ -29,8 +29,16 @@ function handleMessage(message) {
     }
 }
 
-chrome.storage.sync.set({ activeOnPageLoad: true }, () => {
-    console.log("by default, the extension is active, because it's in development and it saves time");
+chrome.storage.sync.get('tutorialShown', ({ tutorialShown }) => {
+    if (tutorialShown === undefined) {
+        chrome.storage.sync.set({ tutorialShown: true }, () => {
+            console.log('The tutorial tab will now be shown');
+
+            const tutPageURL = chrome.runtime.getURL('tutorialPage/acetateTutorial.html');
+
+            chrome.tabs.create({ url: tutPageURL });
+        });
+    }
 });
 
 // Listen for browser Action to be clicked (change trigger type?)
