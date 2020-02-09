@@ -40,12 +40,6 @@ cardsContainer {
     resize: none;
 }
 
-/* Revisit dark mode at a later date*/
-/* .dark.commentTextArea {
-    background-color: #353535;
-    color: white;
-} */
-
 .controls {
     flex: 1;
     height: 100%;

@@ -368,13 +368,6 @@ function displayAnnotation(annotation) {
 
     annotationTextBox.innerHTML = annotation.comment;
 
-    // // Apply theme styles if needed
-    // const isInDarkMode = checkTheme();
-
-    // if (isInDarkMode) {
-    //     annotationTextBox.classList.add('dark');
-    // }
-
     const cardsContainer = shadow.querySelector('cardsContainer');
     cardsContainer.appendChild(cloneCommentBox);
 
@@ -391,27 +384,3 @@ function removeAnnotatedElemStyling() {
         annotatedElems[0].classList.remove('annotated');
     }
 }
-
-// function checkTheme() {
-//     const cardsContainer = document.querySelector('div#shadowContainer');
-//     return cardsContainer.classList.contains('dark');
-// }
-
-// function changeTheme() {
-//     const cardsContainer = document.querySelector('div#shadowContainer');
-//     const commentTextAreas = [...document.getElementsByClassName('commentTextArea')];
-
-//     const isInDarkMode = checkTheme();
-
-//     if (isInDarkMode) {
-//         // Remove dark mode classes
-//         cardsContainer.classList.remove('dark');
-//         commentTextAreas.forEach(cta => {
-//             cta.classList.remove('dark');
-//         });
-//     } else {
-//         // Add dark mode classes
-//         cardsContainer.classList.add('dark');
-//         commentTextAreas.forEach(cta => cta.classList.add('dark'));
-//     }
-// }
