@@ -17,3 +17,8 @@ p, h1, h2 {
 #testImage {
     max-height: 300px;
 }
+
+.alert {
+    color: red;
+     font-style: italic;
+}
