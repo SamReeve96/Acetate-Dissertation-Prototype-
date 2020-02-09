@@ -9,8 +9,7 @@
         {
             "matches": 
             [
-                "http://*/*",
-                "https://*/*"
+                "<all_urls>"
             ],
             "js": 
             [
@@ -52,6 +51,7 @@
     ],
     "version": "0.1",
     "web_accessible_resources": [
-        "contentScripts/commentContainer/commentContainer.css"
+        "contentScripts/commentContainer/commentContainer.css",
+        "tutorialPage"
     ]
 }
