@@ -39,7 +39,7 @@ chrome.storage.sync.get('tutorialShown', ({ tutorialShown }) => {
         chrome.storage.sync.set({ tutorialShown: true }, () => {
             console.log('The tutorial tab will now be shown');
 
-            const tutPageURL = chrome.runtime.getURL('tutorialPage/acetateTutorial.html');
+            const tutPageURL = 'https://acetate-34616.web.app/Tutorial/';
 
             chrome.tabs.create({ url: tutPageURL });
         });
