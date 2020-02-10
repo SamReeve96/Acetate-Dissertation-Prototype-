@@ -1,9 +1,14 @@
 // Add listener for messaged
 chrome.runtime.onMessage.addListener(message => {
-    handleMessage(message);
+    try {
+        handleMessage(message);
+        return true;
+    } catch (err) {
+        console.log('message error: ' + err.message);
+    }
 });
 
-function handleMessage(message) {
+async function handleMessage(message) {
     switch (message.type) {
     case 'changeActiveState':
         sendChangeContainerState();
@@ -76,9 +81,7 @@ function returnCachedSortOrderToContent() {
 
     // Send message
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, message, () => {
-            console.log('changeContainerState message sent');
-        });
+        chrome.tabs.sendMessage(tabs[0].id, message);
     });
 }
 
@@ -90,9 +93,7 @@ function sendChangeContainerState() {
 
     // Send message
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, message, () => {
-            console.log('changeContainerState message sent');
-        });
+        chrome.tabs.sendMessage(tabs[0].id, message);
     });
 }
 
@@ -108,9 +109,7 @@ function sendChangeAnnotationSort(newSortOrder) {
 
     // Send message
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, message, () => {
-            console.log('changeAnnotationSort message sent');
-        });
+        chrome.tabs.sendMessage(tabs[0].id);
     });
 }
 

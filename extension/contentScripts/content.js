@@ -4,21 +4,29 @@
 let containerStateActive = false;
 
 // Add listener for messages from backend
-chrome.extension.onMessage.addListener(handleMessage);
-function handleMessage(request) {
-    switch (request.type) {
+chrome.extension.onMessage.addListener(message => {
+    try {
+        handleMessage(message);
+        return true;
+    } catch (err) {
+        console.log('message error: ' + err.message);
+    }
+});
+
+async function handleMessage(message) {
+    switch (message.type) {
     case 'changeContainerState':
         changeContainerState();
         break;
     case 'createAnnotation':
-        createDraftAnnotation(request.content);
+        createDraftAnnotation(message.content);
         break;
     case 'sortAnnotations':
-        cachedSortOrder = request.newSortOrder;
-        sortAnnotations(request.newSortOrder);
+        cachedSortOrder = message.newSortOrder;
+        sortAnnotations(message.newSortOrder);
         break;
     case 'returnCachedSortOrder':
-        cachedSortOrder = request.sortOrder;
+        cachedSortOrder = message.sortOrder;
         break;
     }
 }
