@@ -10,7 +10,7 @@ function getCachedSortOrder() {
     chrome.runtime.sendMessage(message);
 }
 
-function handleMessage(message) {
+async function handleMessage(message) {
     switch (message.type) {
     case 'returnCachedSortOrder':
         cachedSortOrder = message.sortOrder;
@@ -21,7 +21,12 @@ function handleMessage(message) {
 
 // Add listener for messaged
 chrome.runtime.onMessage.addListener(message => {
-    handleMessage(message);
+    try {
+        handleMessage(message);
+        return true;
+    } catch (err) {
+        console.log('message error: ' + err.message);
+    }
 });
 
 getCachedSortOrder();
