@@ -37,12 +37,24 @@ exports.addSheet = functions.https.onRequest((req, res) => {
     console.log(JSONToJS);
 
     // add to firebase
-    db.collection('sheets').add(JSONToJS).then(ref => {
-        console.log('Added document with ID: ', ref.id);
-    });
+    db.collection('sheets').add(JSONToJS)
+        .then(
+            docRef => {
+                let newSheetId = docRef.id;
+                console.log('newSheetId: ', newSheetId);
 
-    // if it went okay inform sender
-    res.status(200).send();
+                if (newSheetId === undefined) {
+                    newSheetId = 'new Sheet Id couldn\'t be returned';
+                }
+
+                // if it went okay inform sender, send back the id of the new sheet
+                res.status(200).send(newSheetId);
+            })
+        .catch(error => {
+            // something went wrong
+            res.status(500).send(error);
+        }
+        );
 });
 
 // update sheet in firestore
