@@ -8,8 +8,20 @@
     ],
     "rewrites": [
       {
-        "source": "/bigben",
-        "function": "bigben"
+        "source": "/loadAllSheets",
+        "function": "loadAllSheets"
+      },
+      {
+        "source": "/loadSheet",
+        "function": "loadSheet"
+      },
+      {
+        "source": "/addSheet",
+        "function": "addSheet"
+      },
+      {
+        "source": "/updateSheet",
+        "function": "updateSheet"
       },
       {
         "source": "**",

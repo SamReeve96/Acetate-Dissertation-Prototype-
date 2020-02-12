@@ -1,0 +1,29 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "webextensions": true
+    },
+    "extends": [
+        "standard"
+    ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "rules": {
+        "arrow-parens": [2, "as-needed"],
+        "camelcase": [2, { "properties": "never" }],
+        "indent": ["error", 4],
+        "line-comment-position": ["error", { "position": "above" }],
+        "no-undef": 1,
+        "no-unused-vars": 1,
+        "prefer-arrow-callback": ["error", { "allowNamedFunctions": true }],
+        "semi": [2, "always"],
+        "space-before-function-paren": ["error", "never"]
+    }
+}
