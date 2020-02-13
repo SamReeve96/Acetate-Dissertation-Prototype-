@@ -3,6 +3,10 @@
 // Initialize active state variable
 let containerStateActive = false;
 
+const currentOriginAndPath = window.location.origin + window.location.pathname;
+
+let currentSheet = {};
+
 // Add listener for messages from backend
 chrome.extension.onMessage.addListener(message => {
     try {
@@ -59,7 +63,7 @@ function loadExtension() {
     getCachedSortOrder();
     auditElements();
     createCommentContainer();
-    loadAnnotationsFromCache();
+    loadSheet();
     addScriptsToPage();
 }
 
@@ -68,6 +72,163 @@ function unloadExtension() {
     removeCardContainerShadow();
     removeAnnotatedElemStyling();
     clearElementAnnotationEventMap();
+}
+
+async function loadSheet() {
+    let cachedSheet = {
+        sheetId: undefined,
+        sheetData: {
+            URL: undefined,
+            lastModified: undefined,
+            annotations: []
+        }
+    };
+
+    const newSheet = {
+        sheetId: undefined,
+        sheetData: {
+            URL: currentOriginAndPath,
+            lastModified: undefined,
+            annotations: []
+        }
+    };
+
+    chrome.storage.sync.get('cachedSheet', result => {
+        if (result.cachedSheet !== undefined) {
+            cachedSheet = result.cachedSheet;
+        }
+    });
+    await loadSheetFromFirestore(currentOriginAndPath)
+        .then(async fireStoreSheet => {
+            // Determine what sheet to use if any (no need to check if firestore doesnt exist and cached does as that is only possible if cached isnt uplaoded)
+            if (fireStoreSheet.sheetData.URL === undefined && cachedSheet.sheetData.URL !== currentOriginAndPath) {
+                // if the firestore sheet isnt defined and cached sheet are not for this page, create a new sheet
+                currentSheet = newSheet;
+
+                // Upload new sheet to firebase
+                await addSheetToFirestore(currentSheet);
+
+                // Set cached new sheet to new sheet
+                cacheSheet(true);
+            } else if (cachedSheet.sheetData.URL !== currentOriginAndPath) {
+                // if firestore sheet is defined for this page but cached sheet is not, set cached sheet to firestore sheet
+                currentSheet = fireStoreSheet;
+
+                // Set cached to fireStore sheet
+                cacheSheet(false);
+            } else if (fireStoreSheet.sheetData.URL === undefined) {
+                // cached sheet is populated but not on the firestore, upload
+                currentSheet = cachedSheet;
+                await addSheetToFirestore(currentSheet);
+
+                // Set cached new sheet to new sheet
+                cacheSheet(true);
+            } else {
+                // if the cached sheet and firestore sheet are both for the current url, compare last modified date
+                if (fireStoreSheet.sheetData.lastModified > cachedSheet.sheetData.lastModified) {
+                    // firestore is more recent, set the cache to use firestore sheet
+                    currentSheet = fireStoreSheet;
+
+                    // Set cached sheet to fireStore sheet
+                    cacheSheet(false);
+                } else if (fireStoreSheet.sheetData.lastModified < cachedSheet.sheetData.lastModified) {
+                    // cached sheet is more recent update firestore sheet with cached sheet
+                    currentSheet = cachedSheet;
+
+                    // update cachedSheet to firebase
+                    await updateFirestoreSheet(currentSheet);
+                } else {
+                    // Cached sheet and firestore sheet are the same, just use cached
+                    currentSheet = cachedSheet;
+                }
+            }
+            loadAnnotationsFromSheet();
+        });
+}
+
+async function addSheetToFirestore(newSheet) {
+    // fetch and update firestoreSheet attrs
+    await postData('https://acetate-34616.web.app/addSheet', newSheet.sheetData, true)
+        .then(response => {
+            currentSheet.sheetId = response.newSheetId;
+        });
+}
+
+async function updateFirestoreSheet(sheet) {
+    // fetch and update firestoreSheet attrs
+    await postData('https://acetate-34616.web.app/updateSheet?sheetID=' + sheet.sheetId, sheet.sheetData, false);
+}
+
+async function loadSheetFromFirestore(currentOriginAndPath) {
+    // Fetch sheet via url
+    let firestoreSheet = {
+        sheetId: undefined,
+        sheetData: {
+            URL: undefined,
+            lastModified: undefined,
+            annotations: []
+        }
+    };
+
+    // fetch and update firestoreSheet attrs
+    const response = await getData('https://acetate-34616.web.app/loadSheetByURL?sheetUrl=' + currentOriginAndPath, true);
+
+    if (response.msg === undefined) {
+        //  Didn't get the page not found msg, so sheet was returned
+        firestoreSheet = response;
+    }
+
+    return firestoreSheet;
+}
+
+async function postData(url = '', data = {}, expectResponse = false) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+        method: 'POST',
+        // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors',
+        // no-cors, *cors, same-origin
+        cache: 'no-cache',
+        // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin',
+        // include, *same-origin, omit
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        // manual, *follow, error
+        referrerPolicy: 'no-referrer',
+        // no-referrer, *client
+        body: JSON.stringify(data)
+        // body data type must match "Content-Type" header
+    });
+    if (expectResponse) {
+        return response.json();
+    }
+}
+
+async function getData(url = '', expectResponse = false) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+        method: 'GET',
+        // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors',
+        // no-cors, *cors, same-origin
+        cache: 'no-cache',
+        // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin',
+        // include, *same-origin, omit
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        // manual, *follow, error
+        referrerPolicy: 'no-referrer'
+        // no-referrer, *client
+    });
+    if (expectResponse) {
+        return response.json();
+    }
 }
 
 function removeCardContainerShadow() {
@@ -181,7 +342,7 @@ function SlideOutCards(annotationsToSlide, allCards = false) {
 
     if (allCards) {
         // Slide all annotations
-        annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
+        annotationsToSlide = currentSheet.sheetData.annotations.map(annotation => {
             return annotation.ID;
         });
     }
@@ -208,7 +369,7 @@ function SlideBackCards(annotationsToSlide, allCards = false) {
 
     if (allCards) {
         // Slide all annotations
-        annotationsToSlide = currentAnnotationInstance.annotations.map(annotation => {
+        annotationsToSlide = currentSheet.sheetData.annotations.map(annotation => {
             return annotation.ID;
         });
     }

@@ -16,8 +16,8 @@ async function handleMessage(message) {
     case 'setNewContextElement':
         setContextElementData(message);
         break;
-    case 'cacheInstance':
-        cacheInstance(message.instance);
+    case 'cacheSheet':
+        cacheSheet(message.Sheet, message.modification);
         break;
     case 'loadFromCache':
         sendLoadFromCache(message.key);
@@ -39,12 +39,23 @@ chrome.storage.sync.get('tutorialShown', ({ tutorialShown }) => {
         chrome.storage.sync.set({ tutorialShown: true }, () => {
             console.log('The tutorial tab will now be shown');
 
-            const tutPageURL = chrome.runtime.getURL('tutorialPage/acetateTutorial.html');
+            const tutPageURL = 'https://acetate-34616.web.app/Tutorial/';
 
             chrome.tabs.create({ url: tutPageURL });
         });
     }
 });
+
+// Store the annotation Sheet in chrome sync storage
+function cacheSheet(sheetToCache, modification) {
+    if (modification) {
+        sheetToCache.sheetData.lastModified = Date.now();
+    }
+    // Save new array of Sheets
+    chrome.storage.sync.set({
+        cachedSheet: sheetToCache
+    });
+}
 
 // Listen for browser Action to be clicked (change trigger type?)
 chrome.browserAction.onClicked.addListener(tab => {
@@ -161,35 +172,6 @@ function sendCreateAnnotation(info, tab) {
     // Reset the context element
     contextElement = undefined;
 }
-
-// Store the annotation instance in chrome sync storage
-function cacheInstance(currentInstance) {
-    // Get all the instances
-    chrome.storage.sync.get(['annotationInstances'], storage => {
-        let annotationInstances = storage.annotationInstances;
-
-        if (annotationInstances) {
-            // See if there is a saved instance for the current URL
-            const savedInstance = storage.annotationInstances.find(instance => (instance.url === currentInstance.url));
-
-            if (savedInstance !== undefined) {
-                // Chrome sync storage has an instance
-                // Remove old instance, as a new version will be added to the list of instances
-                annotationInstances = annotationInstances.filter(instance => (instance.url !== currentInstance.url));
-            }
-        } else {
-            // Storage has no instances, create a new empty array of instances
-            annotationInstances = [];
-        }
-        // Add new url instance
-        annotationInstances.push(currentInstance);
-        // Save new array of instances
-        chrome.storage.sync.set({
-            annotationInstances: annotationInstances
-        });
-    });
-}
-
 // Added for debugging storage changes
 // Or throw this at the console - chrome.storage.sync.get(null, function (data) { console.info(data) });
 chrome.storage.onChanged.addListener((changes, namespace) => {
