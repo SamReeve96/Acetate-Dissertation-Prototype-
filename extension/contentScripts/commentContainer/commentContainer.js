@@ -3,15 +3,6 @@
 // For now default to 1, but in theory this would be read from a DB
 let nextAnnotationId = 1;
 
-const currentOriginAndPath = window.location.origin + window.location.pathname;
-
-let annotationInstances = [];
-
-let currentAnnotationInstance = {
-    url: currentOriginAndPath,
-    annotations: []
-};
-
 // Annotations that have not been saved
 // TODO if the user leaves the page when this array is populated, alert are they sure they want to leave-
 let draftAnnotations = [];
@@ -35,7 +26,7 @@ function getCachedSortOrder() {
 
 function sortAnnotations(newSortOrder, redrawAnnotations = true) {
     if (newSortOrder === annotationSortMode.ELEMENT) {
-        currentAnnotationInstance.annotations.sort((annotation1, annotation2) => {
+        currentSheet.sheetData.annotations.sort((annotation1, annotation2) => {
             if (annotation1.elementAuditID > annotation2.elementAuditID) {
                 return 1;
             }
@@ -47,7 +38,7 @@ function sortAnnotations(newSortOrder, redrawAnnotations = true) {
             }
         });
     } else if (newSortOrder === annotationSortMode.CREATED) {
-        currentAnnotationInstance.annotations.sort((annotation1, annotation2) => {
+        currentSheet.sheetData.annotations.sort((annotation1, annotation2) => {
             return annotation1.created - annotation2.created;
         });
     }
@@ -66,7 +57,7 @@ function sortAnnotations(newSortOrder, redrawAnnotations = true) {
 
         // Redraw annotations
         // For all annotations, load
-        currentAnnotationInstance.annotations.forEach(annotation => {
+        currentSheet.sheetData.annotations.forEach(annotation => {
             displayAnnotation(annotation);
             setEditMode(annotation.ID, false);
         });
@@ -104,41 +95,36 @@ function createDraftAnnotation(annotationData) {
     }
 }
 
-function cacheInstance() {
+function cacheSheet(modification = false) {
     const message = {
-        type: 'cacheInstance',
-        instance: currentAnnotationInstance
+        type: 'cacheSheet',
+        modification: modification,
+        Sheet: currentSheet
     };
 
     chrome.runtime.sendMessage(message);
 }
 
 // When the extension is loaded on a page, load all the annotations from the cache
-function loadAnnotationsFromCache() {
-    // Set variable instance to cache instance
-    chrome.storage.sync.get(['annotationInstances'], result => {
-        annotationInstances = result.annotationInstances;
+function loadAnnotationsFromSheet() {
+    // MIGHT BE ABLE TO REMOVE THIS CHECK ONCE SYNC VS FS STUFF IS DONE
+    // Only display annotations if on the page
+    if (currentSheet.sheetData.URL === currentOriginAndPath) {
+        // Sort Annotations before displaying them
+        sortAnnotations(annotationSortMode.ELEMENT, false);
 
-        if (annotationInstances !== undefined) {
-            // Filter all instances stored in the browser and check if the current page already has an instance
-            const filteredInstances = annotationInstances.filter(instance => (instance.url === currentOriginAndPath));
-            if (filteredInstances.length === 1) {
-                currentAnnotationInstance = filteredInstances[0];
+        // For all annotations, load
+        currentSheet.sheetData.annotations.forEach(annotation => {
+            displayAnnotation(annotation);
+            setEditMode(annotation.ID, false);
+        });
 
-                // Sort Annotations before displaying them
-                sortAnnotations(annotationSortMode.ELEMENT, false);
-
-                // For all annotations, load
-                currentAnnotationInstance.annotations.forEach(annotation => {
-                    displayAnnotation(annotation);
-                    setEditMode(annotation.ID, false);
-                });
-
-                // If annotations have been loaded, update the next id
-                getNextAnnotationID();
-            }
-        }
-    });
+        // If annotations have been loaded, update the next id
+        getNextAnnotationID();
+    } else {
+        // This message shouldn't really happen
+        console.log('current page does not match current sheet url');
+    }
 }
 
 // Get the next annotation ID if annotations are loaded from Cache (function will be removed when DB is implemented)
@@ -146,7 +132,7 @@ function getNextAnnotationID() {
     let largestId = nextAnnotationId;
 
     // Get the highest id from cached annotations
-    currentAnnotationInstance.annotations.forEach(annotation => {
+    currentSheet.sheetData.annotations.forEach(annotation => {
         if (annotation.ID > largestId) {
             largestId = annotation.ID;
         }
@@ -208,12 +194,13 @@ function saveAnnotation(buttonClick) {
         return;
     }
 
-    // The annotation currently in drafts that will be moved to the instance array
+    // The annotation currently in drafts that will be moved to the Sheet array
     const shadow = document.querySelector('div#shadowContainer').shadowRoot;
     draftAnnotation.comment = shadow.querySelector('[annotationId="' + annotationId + '"] textarea').value;
-    currentAnnotationInstance.annotations.push(draftAnnotation);
-    cacheInstance();
+    currentSheet.sheetData.annotations.push(draftAnnotation);
+    cacheSheet(true);
     // Then upload to db
+    updateFirestoreSheet(currentSheet);
 
     // Remove from drafts
     draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
@@ -226,7 +213,7 @@ function deleteAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
     // Find the annotation
-    const annotationToDelete = currentAnnotationInstance.annotations.find(annotation => annotation.ID === annotationId);
+    const annotationToDelete = currentSheet.sheetData.annotations.find(annotation => annotation.ID === annotationId);
 
     if (annotationToDelete === undefined) {
         console.log('Failed to find annotation with the Id: ' + annotationId);
@@ -234,11 +221,11 @@ function deleteAnnotation(buttonClick) {
     }
 
     // Remove from cache
-    currentAnnotationInstance.annotations = currentAnnotationInstance.annotations.filter(annotation => annotation.ID !== annotationId);
-    cacheInstance();
+    currentSheet.sheetData.annotations = currentSheet.sheetData.annotations.filter(annotation => annotation.ID !== annotationId);
+    cacheSheet(true);
 
     // Then remove from DB
-    // Implementing at beta
+    updateFirestoreSheet(currentSheet);
 
     // Remove html element0
     const shadow = document.querySelector('div#shadowContainer').shadowRoot;
@@ -264,18 +251,20 @@ function editAnnotation(buttonClick) {
 function updateAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
     // Find the annotation in the cache and update it's attributes
-    const annotationIndex = currentAnnotationInstance.annotations.findIndex(annotation => annotation.ID === annotationId);
+    const annotationIndex = currentSheet.sheetData.annotations.findIndex(annotation => annotation.ID === annotationId);
 
     if (annotationIndex >= 0) {
-        const annotationToUpdate = currentAnnotationInstance.annotations[annotationIndex];
+        const annotationToUpdate = currentSheet.sheetData.annotations[annotationIndex];
         // Right now editing just the annotation comment
         const shadow = document.querySelector('div#shadowContainer').shadowRoot;
         const annotationText = shadow.querySelector('[annotationId="' + annotationId + '"] textarea').value;
         annotationToUpdate.comment = annotationText;
         annotationToUpdate.lastUpdated = Date.now();
 
-        currentAnnotationInstance.annotations[annotationIndex] = annotationToUpdate;
-        cacheInstance();
+        currentSheet.sheetData.annotations[annotationIndex] = annotationToUpdate;
+        cacheSheet(true);
+
+        updateFirestoreSheet(currentSheet);
 
         setEditMode(annotationId, false);
     }
@@ -314,8 +303,8 @@ function cancelAnnotation(buttonClick) {
         }
     } else {
         // Reset commentBox value
-        const annotationIndex = currentAnnotationInstance.annotations.findIndex(annotation => annotation.ID === annotationId);
-        shadow.querySelector('[annotationId="' + annotationId + '"] textarea').value = currentAnnotationInstance.annotations[annotationIndex].comment;
+        const annotationIndex = currentSheet.sheetData.annotations.findIndex(annotation => annotation.ID === annotationId);
+        shadow.querySelector('[annotationId="' + annotationId + '"] textarea').value = currentSheet.sheetData.annotations[annotationIndex].comment;
         setEditMode(annotationId, false);
     }
 }
@@ -325,7 +314,7 @@ function displayAnnotation(annotation) {
     const shadow = document.querySelector('div#shadowContainer').shadowRoot;
     const commentBoxTemplate = shadow.querySelector('template');
 
-    // Create new comment instance
+    // Create new comment Sheet
     const cloneCommentBox = document.importNode(commentBoxTemplate.content, true);
 
     // Allows the extension to work out what annotation button was pressed
