@@ -19,9 +19,6 @@ async function handleMessage(message) {
     case 'cacheSheet':
         cacheSheet(message.Sheet, message.modification);
         break;
-    case 'loadFromCache':
-        sendLoadFromCache(message.key);
-        break;
     case 'changeAnnotationSort':
         sendChangeAnnotationSort(message.newSortOrder);
         break;
@@ -120,18 +117,20 @@ function sendChangeAnnotationSort(newSortOrder) {
 
     // Send message
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id);
+        chrome.tabs.sendMessage(tabs[0].id, message);
     });
 }
 
 // Context menu ID
 const annotateElementCMenuID = 'Annotate Element';
 
-// Create the Annotate right-click menu option
-chrome.contextMenus.create({
-    id: annotateElementCMenuID,
-    title: 'Annotate %s',
-    contexts: ['page', 'selection', 'image', 'link']
+// Create the Annotate right-click menu option (remove all and re-add to ensure it isnt duplicated)
+chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+        id: annotateElementCMenuID,
+        title: 'Annotate %s',
+        contexts: ['page', 'selection', 'image', 'link']
+    });
 });
 
 // Holds the element triggered when right-clicking
