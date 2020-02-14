@@ -1,7 +1,7 @@
 // Manage comments
 
-// For now default to 1, but in theory this would be read from a DB
-let nextAnnotationId = 1;
+// For now default to 0, but in theory this would be read from a DB
+let nextAnnotationId = 0;
 
 // Annotations that have not been saved
 // TODO if the user leaves the page when this array is populated, alert are they sure they want to leave-
@@ -107,7 +107,6 @@ function cacheSheet(modification = false) {
 
 // When the extension is loaded on a page, load all the annotations from the cache
 function loadAnnotationsFromSheet() {
-    // MIGHT BE ABLE TO REMOVE THIS CHECK ONCE SYNC VS FS STUFF IS DONE
     // Only display annotations if on the page
     if (currentSheet.sheetData.URL === currentOriginAndPath) {
         // Sort Annotations before displaying them
@@ -123,7 +122,7 @@ function loadAnnotationsFromSheet() {
         getNextAnnotationID();
     } else {
         // This message shouldn't really happen
-        console.log('current page does not match current sheet url');
+        console.error('current page does not match current sheet url');
     }
 }
 
@@ -183,6 +182,15 @@ function setEditMode(annotationId, editMode = true) {
     }
 }
 
+function sendUpdateFirestoreSheet(sheet) {
+    const message = {
+        type: 'updateFirestoreSheet',
+        sheet: sheet
+    };
+
+    chrome.runtime.sendMessage(message);
+}
+
 function saveAnnotation(buttonClick) {
     const annotationId = getIDFromButtonClick(buttonClick);
 
@@ -200,7 +208,7 @@ function saveAnnotation(buttonClick) {
     currentSheet.sheetData.annotations.push(draftAnnotation);
     cacheSheet(true);
     // Then upload to db
-    updateFirestoreSheet(currentSheet);
+    sendUpdateFirestoreSheet(currentSheet);
 
     // Remove from drafts
     draftAnnotations = draftAnnotations.filter(annotation => annotation.ID !== annotationId);
@@ -225,7 +233,7 @@ function deleteAnnotation(buttonClick) {
     cacheSheet(true);
 
     // Then remove from DB
-    updateFirestoreSheet(currentSheet);
+    sendUpdateFirestoreSheet(currentSheet);
 
     // Remove html element0
     const shadow = document.querySelector('div#shadowContainer').shadowRoot;
@@ -264,7 +272,7 @@ function updateAnnotation(buttonClick) {
         currentSheet.sheetData.annotations[annotationIndex] = annotationToUpdate;
         cacheSheet(true);
 
-        updateFirestoreSheet(currentSheet);
+        sendUpdateFirestoreSheet(currentSheet);
 
         setEditMode(annotationId, false);
     }
