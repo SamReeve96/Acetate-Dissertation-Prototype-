@@ -191,12 +191,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 let currentSheet = {};
 
-chrome.tabs.onActivated.addListener(() => { activeTabChanged(); });
-
-function activeTabChanged() {
-    
-}
-
 async function checkCacheAndFirestoreSheet(currentOriginAndPath) {
     let cachedSheet = {
         sheetId: undefined,
