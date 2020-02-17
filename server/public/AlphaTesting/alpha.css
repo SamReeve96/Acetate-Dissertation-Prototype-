@@ -1,0 +1,19 @@
+h1 {
+    color: rgb(206, 158, 0);
+}
+
+img {
+    border: 1px solid #cd9e00;
+    margin: 15px;
+    max-width: 400px;
+}
+
+body {
+    background-color: whitesmoke;
+    font-family: Roboto, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.alert {
+    color: red;
+     font-style: italic;
+}
