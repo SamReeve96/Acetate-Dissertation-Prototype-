@@ -35,6 +35,9 @@ async function handleMessage(message) {
     case 'updateFirestoreSheet':
         updateFirestoreSheet(message.sheet);
         break;
+    case 'changeExtensionIcon':
+        changeExtensionIcon(message.state);
+        break;
     }
     return true;
 }
@@ -49,6 +52,42 @@ chrome.storage.sync.get('tutorialShown', ({ tutorialShown }) => {
             chrome.tabs.create({ url: tutPageURL });
         });
     }
+});
+
+const icons = {
+    enabled: {
+        16: '/images/acetate16.png',
+        32: 'images/acetate32.png',
+        48: '/images/acetate48.png',
+        128: '/images/acetate128.png'
+    },
+    disabled: {
+        16: '/images/acetate16_Disabled.png',
+        32: 'images/Acetate32_Disabled.png',
+        48: '/images/Acetate48_Disabled.png',
+        128: '/images/Acetate128_Disabled.png'
+    }
+};
+
+// change the extension icon based on Acetate state
+function changeExtensionIcon(active = false) {
+    const icon = active ? icons.enabled : icons.disabled;
+
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        // tabId: tabs[0].id,
+        chrome.browserAction.setIcon({ path: icon });
+    });
+}
+
+chrome.tabs.onActivated.addListener(async() => {
+    const message = {
+        type: 'syncIconState'
+    };
+
+    // Send message
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, message, null, () => { return true; });
+    });
 });
 
 // Store the annotation Sheet in chrome sync storage
