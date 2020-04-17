@@ -3,6 +3,9 @@
 // Initialize active state variable
 let containerStateActive = false;
 
+// Update the extension icon to reflect the extension's state
+sendChangeExtensionIconAndContextMenu(containerStateActive);
+
 const currentOriginAndPath = window.location.origin + window.location.pathname;
 
 let currentSheet = {};
@@ -36,6 +39,8 @@ async function handleMessage(message) {
         currentSheet = message.currentSheet;
         loadAnnotationsFromSheet();
         break;
+    case 'syncIconState':
+        sendChangeExtensionIconAndContextMenu(containerStateActive);
     }
 }
 
@@ -69,6 +74,9 @@ function loadExtension() {
     createCommentContainer();
     loadSheetForPage();
     addScriptsToPage();
+
+    // Change icon to show active icon
+    sendChangeExtensionIconAndContextMenu(true);
 }
 
 function unloadExtension() {
@@ -76,6 +84,20 @@ function unloadExtension() {
     removeCardContainerShadow();
     removeAnnotatedElemStyling();
     clearElementAnnotationEventMap();
+
+    // Change icon to show disabled icon
+    sendChangeExtensionIconAndContextMenu(false);
+}
+
+async function sendChangeExtensionIconAndContextMenu(state) {
+    const message = {
+        type: 'changeExtensionIconAndContextMenu',
+        state: state
+    };
+
+    await chrome.runtime.sendMessage(message, undefined, response => {
+        return true;
+    });
 }
 
 async function sendCheckCacheAndFirestoreSheet() {

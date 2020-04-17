@@ -36,10 +36,10 @@
     "browser_action": {
         "default_popup": "popup/popup.html",
         "default_icon": {
-            "16": "images/acetate16.png",
-            "32": "images/acetate32.png",
-            "48": "images/acetate48.png",
-            "128": "images/acetate128.png"
+            "16": "images/acetate16_Disabled.png",
+            "32": "images/acetate32_Disabled.png",
+            "48": "images/acetate48_Disabled.png",
+            "128": "images/acetate128_Disabled.png"
         }
     },
     "permissions": [
