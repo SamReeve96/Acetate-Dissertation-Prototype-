@@ -4,7 +4,7 @@
 let containerStateActive = false;
 
 // Update the extension icon to reflect the extension's state
-sendChangeExtensionIcon(containerStateActive);
+sendChangeExtensionIconAndContextMenu(containerStateActive);
 
 const currentOriginAndPath = window.location.origin + window.location.pathname;
 
@@ -40,7 +40,7 @@ async function handleMessage(message) {
         loadAnnotationsFromSheet();
         break;
     case 'syncIconState':
-        sendChangeExtensionIcon(containerStateActive);
+        sendChangeExtensionIconAndContextMenu(containerStateActive);
     }
 }
 
@@ -76,7 +76,7 @@ function loadExtension() {
     addScriptsToPage();
 
     // Change icon to show active icon
-    sendChangeExtensionIcon(true);
+    sendChangeExtensionIconAndContextMenu(true);
 }
 
 function unloadExtension() {
@@ -86,12 +86,12 @@ function unloadExtension() {
     clearElementAnnotationEventMap();
 
     // Change icon to show disabled icon
-    sendChangeExtensionIcon(false);
+    sendChangeExtensionIconAndContextMenu(false);
 }
 
-async function sendChangeExtensionIcon(state) {
+async function sendChangeExtensionIconAndContextMenu(state) {
     const message = {
-        type: 'changeExtensionIcon',
+        type: 'changeExtensionIconAndContextMenu',
         state: state
     };
 

@@ -35,8 +35,9 @@ async function handleMessage(message) {
     case 'updateFirestoreSheet':
         updateFirestoreSheet(message.sheet);
         break;
-    case 'changeExtensionIcon':
+    case 'changeExtensionIconAndContextMenu':
         changeExtensionIcon(message.state);
+        changeContextmenuControls(message.state);
         break;
     }
     return true;
@@ -168,17 +169,32 @@ function sendChangeAnnotationSort(newSortOrder) {
     });
 }
 
+function changeContextmenuControls(activeState) {
+    if (activeState) {
+        addAcetateControlsToContextmenu();
+    } else {
+        removeAcetateControlsToContextmenu();
+    }
+}
+
 // Context menu ID
 const annotateElementCMenuID = 'Annotate Element';
 
-// Create the Annotate right-click menu option (remove all and re-add to ensure it isnt duplicated)
-chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({
-        id: annotateElementCMenuID,
-        title: 'Annotate %s',
-        contexts: ['page', 'selection', 'image', 'link']
+function addAcetateControlsToContextmenu() {
+    // Create the Annotate right-click menu option (remove all and re-add to ensure it isnt duplicated)
+    chrome.contextMenus.removeAll(() => {
+        chrome.contextMenus.create({
+            id: annotateElementCMenuID,
+            title: 'Annotate %s',
+            contexts: ['page', 'selection', 'image', 'link']
+        });
     });
-});
+}
+
+function removeAcetateControlsToContextmenu() {
+    // Create the Annotate right-click menu option (remove all and re-add to ensure it isnt duplicated)
+    chrome.contextMenus.removeAll();
+}
 
 // Holds the element triggered when right-clicking
 let contextElementData;
@@ -216,7 +232,7 @@ function sendCreateAnnotation(info, tab) {
     });
 
     // Reset the context element
-    contextElement = undefined;
+    contextElementData = undefined;
 }
 // Added for debugging storage changes
 // Or throw this at the console - chrome.storage.sync.get(null, function (data) { console.info(data) });
