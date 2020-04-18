@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/SamReeve96/Acetate.svg?branch=master)](https://travis-ci.org/SamReeve96/Acetate)
 [![GitHub version](https://badge.fury.io/gh/SamReeve96%2FAcetate.svg)](https://badge.fury.io/gh/SamReeve96%2FAcetate)
 [![Known Vulnerabilities](https://snyk.io/test/github/SamReeve96/Acetate/badge.svg)](https://snyk.io/test/github/SamReeve96/Acetate)
 [![HitCount](http://hits.dwyl.com/SamReeve96/Acetate.svg)](http://hits.dwyl.com/SamReeve96/Acetate)
