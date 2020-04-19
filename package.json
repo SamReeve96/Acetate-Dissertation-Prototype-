@@ -4,7 +4,7 @@
   "description": "Annotate the web",
   "main": "extension/contentScripts/content.js",
   "dependencies": {
-    "firebase": "^7.13.0",
+    "firebase": "^7.13.1",
     "firebase-admin": "^8.10.0"
   },
   "devDependencies": {
