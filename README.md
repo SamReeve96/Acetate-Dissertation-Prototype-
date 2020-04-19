@@ -13,6 +13,9 @@ A browser extension to annotate the web.
 
 Acetate will enable users to annotate webpages with comments to provide feedback on website design.
 
+## Tutorial
+New to Acetate? Check out the brief tutorial [here!](https://acetate-34616.web.app/Tutorial/) (This page will also automatically load when the extension is installed)
+
 ## Contribution guide
 Acetate would love your help! 
 If you'd like to know more about the process of contributing to Acetate please read more here: [CONTRIBUTING.md](https://github.com/SamReeve96/Acetate/blob/master/CONTRIBUTING.md)
