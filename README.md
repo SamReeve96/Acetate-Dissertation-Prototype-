@@ -13,7 +13,7 @@ A browser extension to annotate the web.
 
 Acetate will enable users to annotate webpages with comments to provide feedback on website design.
 
-## Developer instalition guide
+## Developer installation guide
 Installing Developer Chrome extensions can be fiddly, here's a quick step-by-step guide on the process
 1. Visit the extension page by either pasting in this link "chrome://extensions" or "menu -> Tools -> Extensions".
 2. Enable Developer mode by ticking the checkbox in the upper-right corner.
