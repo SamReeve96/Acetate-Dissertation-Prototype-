@@ -68,6 +68,4 @@ A few features were repeatedly requested in the Alpha test, those were:
 - Changing the extension Icon to reflect wether the extension is active or not
 - only show the extension control in the context menu if the extension is active
 
-These are now Implemented!
-
-This is the end of the current project scope, new release plans are to be announced soon!
+All 4 phases are now Implemented!
