@@ -49,7 +49,7 @@
         "storage",
         "tabs"
     ],
-    "version": "0.5",
+    "version": "0.5.1",
     "web_accessible_resources": [
         "contentScripts/commentContainer/commentContainer.css",
         "tutorialPage"
