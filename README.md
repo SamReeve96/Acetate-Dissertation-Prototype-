@@ -27,16 +27,16 @@ New to Acetate? Check out the brief tutorial [here!](https://acetate-34616.web.a
 
 ## Contribution guide
 Acetate would love your help! 
-If you'd like to know more about the process of contributing to Acetate please read more here: [CONTRIBUTING.md](https://github.com/SamReeve96/Acetate/blob/master/CONTRIBUTING.md)
+If you'd like to know more about the process of contributing to Acetate please read more here: [CONTRIBUTING.md](https://github.com/SamReeve96/Acetate-Dissertation-Prototype-/blob/master/CONTRIBUTING.md)
 
 ## Development story
 ### Prototype
 
-The purpose of the prototype was to create an interactive demo that could be shown to possible end users for early feedback. The prototype has been completed, and has a branch that can be viewed at: https://github.com/SamReeve96/Acetate/tree/Prototype-One
+The purpose of the prototype was to create an interactive demo that could be shown to possible end users for early feedback. The prototype has been completed, and has a branch that can be viewed at: https://github.com/SamReeve96/Acetate-Dissertation-Prototype-/tree/Prototype-One
 
 Note the prototype's method of wrapping the page was not built to be used as an actual solution, but for speed of implementation, it will break event listeners and combat with CSS rules. So far a good example of a page that reacts well is bbc.co.uk
 
-![Image of Prototype](https://github.com/SamReeve96/Acetate/blob/master/Misc%20Resources/Images/PrototypeOneScreenshot-20012020.png?raw=true)
+![Image of Prototype](https://github.com/SamReeve96/Acetate-Dissertation-Prototype-/blob/master/Misc%20Resources/Images/PrototypeOneScreenshot-20012020.png?raw=true)
 
 ### Alpha
 The Alpha will take feedback from the prototype to influence the design of the extension and resolve any known bugs or issues.
@@ -50,7 +50,7 @@ Key goals:
 - Resolve known bugs
 - Take feedback from prototype phase to further influence design of extension
 
-![Image of Alpha UI update](https://github.com/SamReeve96/Acetate/blob/master/Misc%20Resources/Images/AcetateUIAlphaUpdate.gif?raw=true)
+![Image of Alpha UI update](https://github.com/SamReeve96/Acetate-Dissertation-Prototype-/blob/master/Misc%20Resources/Images/AcetateUIAlphaUpdate.gif?raw=true)
 
 Demo showing new UI and card popout triggers (hover over the card, the cards corresponding element or pressing the shortcut to open them all (currently assigned to "o")
 
