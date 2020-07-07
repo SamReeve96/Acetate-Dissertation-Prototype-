@@ -1,4 +1,4 @@
-This project has reached an end point, but the idea lives on with [Acetate 2!](https://github.com/SamReeve96/Acetate_2)
+This project has reached an end point, but the idea lives on with [Acetate 2!](https://github.com/SamReeve96/Acetate)
 
 [![Build Status](https://travis-ci.org/SamReeve96/Acetate.svg?branch=master)](https://travis-ci.org/SamReeve96/Acetate)
 [![GitHub version](https://badge.fury.io/gh/SamReeve96%2FAcetate.svg)](https://badge.fury.io/gh/SamReeve96%2FAcetate)
